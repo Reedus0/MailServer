@@ -7,25 +7,63 @@
 #include "codes.h"
 #include "mail.h"
 
+static void clear_buffer(char* buffer) {
+	memset(buffer, 0, BUFFER_SIZE);
+}
+
+static void socket_cleanup(SOCKET sock) {
+	shutdown(sock, SD_BOTH);
+	closesocket(sock);
+}
+
 static int get_message(SOCKET sock, char* buffer) {
-	return recv(sock, buffer, BUFFER_SIZE, 0);
+	clear_buffer(buffer);
+	int status = recv(sock, buffer, BUFFER_SIZE, 0);
+	return status;
 }
 
 static int send_response(SOCKET sock, char* response) {
-	return send(sock, response, strlen(response), 0);
+	int status = send(sock, response, strlen(response), 0);
+	clear_buffer(response);
+	return status;
 }
 
-static void clear_buffer(char* buffer) {
-	memset(buffer, 0, BUFFER_SIZE);
+static int send_code_response(SOCKET sock, char* response, char* code) {
+	clear_buffer(response);
+	add_to_message(response, code);
+	return send_response(sock, response);
+}
+
+static char* get_value_from_message(char* message, int offset) {
+	int new_length = strlen(message) - offset + 1;
+	char* result = calloc(new_length + 1, sizeof(char));
+	memcpy(result, message + offset + 1, new_length);
+	*(result + strlen(result)) = 0;
+	return result;
+}
+
+static int check_message_command(char* command, char* message) {
+	return !memcmp(message, command, strlen(command));
+}
+
+static char* get_mail_content(SOCKET sock, char* buffer) {
+	char* message = calloc(MESSAGE_SIZE, sizeof(char));
+	while (1) {
+		int status = get_message(sock, buffer);
+		if (status == -1) break;
+
+		if (!memcmp(buffer, ".\n", 2)) break;
+
+		add_to_message(message, buffer);
+	}
+	return message;
 }
 
 void serve_connection(SOCKET sock) {
 	int status = 0;
 	char* buffer = calloc(BUFFER_SIZE, sizeof(char));
 
-	build_message(buffer, SERVICE_READY, " Hello, from server!", "\n");
-	send_response(sock, buffer);
-	clear_buffer(buffer);
+	send_code_response(sock, buffer, SERVICE_READY);
 
 	struct mail new_mail;
 
@@ -35,94 +73,57 @@ void serve_connection(SOCKET sock) {
 			break;
 		}
 
-		if (!memcmp(buffer, "HELO", 4)) {
-			int new_length = strlen(buffer) - 5;
-			char* domain = calloc(new_length, sizeof(char));
-			memcpy(domain, buffer + 5, new_length - 1);
-			*(domain + new_length) = 0;
+		if (check_message_command("QUIT", buffer)) {
+			send_code_response(sock, buffer, SERVICE_CLOSING_TRANSMISSION);
+			break;
+		}
+
+		if (check_message_command("HELO", buffer)) {
+			char* domain = get_value_from_message(buffer, strlen("HELO"));
 			new_mail.domain = domain;
 			printf("%s", new_mail.domain);
+
+			status = send_code_response(sock, buffer, ACTION_OK);
+			if (status == -1) break;
 			continue;
 		}
 
-		if (!memcmp(buffer, "MAIL FROM:", 10)) {
-			int new_length = strlen(buffer) - 11;
-			char* mail_from = calloc(new_length, sizeof(char));
-			memcpy(mail_from, buffer + 11, new_length - 1);
-			*(mail_from + new_length) = 0;
+		if (check_message_command("MAIL FROM:", buffer)) {
+			char* mail_from = get_value_from_message(buffer, strlen("MAIL FROM:"));
 			new_mail.mail_from = mail_from;
 			printf("%s", new_mail.mail_from);
+
+			status = send_code_response(sock, buffer, ACTION_OK);
+			if (status == -1) break;
 			continue;
 		}
 
-		if (!memcmp(buffer, "RCPT TO:", 8)) {
-			int new_length = strlen(buffer) - 9;
-			char* rcpt_to = calloc(new_length, sizeof(char));
-			memcpy(rcpt_to, buffer + 9, new_length - 1);
-			*(rcpt_to + new_length) = 0;
+		if (check_message_command("RCPT TO:", buffer)) {
+			char* rcpt_to = get_value_from_message(buffer, strlen("RCPT TO:"));
 			new_mail.rcpt_to = rcpt_to;
 			printf("%s", new_mail.rcpt_to);
+
+			status = send_code_response(sock, buffer, ACTION_OK);
+			if (status == -1) break;
 			continue;
 		}
 
-		if (!memcmp(buffer, "DATA", 4)) {
-			clear_buffer(buffer);
-			build_message(buffer, START_MAIL_INPUT, " End mail with single .", "\n");
-			status = send_response(sock, buffer);
-			if (status == -1) {
-				break;
-			}
-			clear_buffer(buffer);
+		if (check_message_command("DATA", buffer)) {
+			status = send_code_response(sock, buffer, START_MAIL_INPUT);
+			if (status == -1) break;
 
-			char* message = calloc(MAIL_SIZE, sizeof(char));
-			while (1) {
-				status = get_message(sock, buffer);
-				if (status == -1) {
-					break;
-				}
-
-				if (!memcmp(buffer, ".\n", 2)) {
-					break;
-				}
-
-				add_to_message(message, buffer);
-				clear_buffer(buffer);
-
-			}
-			int new_length = strlen(message);
-			*(message + new_length) = 0;
+			char* message = get_mail_content(sock, buffer);
 			new_mail.data = message;
 
 			printf("%s", new_mail.data);
 
-			clear_buffer(buffer);
-			build_message(buffer, ACTION_OK, " Got mail", "\n");
-			status = send_response(sock, buffer);
-			if (status == -1) {
-				break;
-			}
-			clear_buffer(buffer);
+			status = send_code_response(sock, buffer, ACTION_OK);
+			if (status == -1) break;
 			continue;
 		}
 
-		if (!memcmp(buffer, "QUIT", 4)) {
-			build_message(buffer, SERVICE_CLOSING_TRANSMISSION, " Bye", "\n");
-			status = send_response(sock, buffer);
-			if (status == -1) {
-				break;
-			}
-			clear_buffer(buffer);
-			break;
-		}
-
-		clear_buffer(buffer);
-		build_message(buffer, SYNTAX_ERROR, " Syntex error", "\n");
-		status = send_response(sock, buffer);
-		if (status == -1) {
-			break;
-		}
-		clear_buffer(buffer);
+		status = send_code_response(sock, buffer, SYNTAX_ERROR);
+		if (status == -1) break;
 	}
-	shutdown(sock, SD_BOTH);
-	closesocket(sock);
+	socket_cleanup(sock);
 }
