@@ -6,3 +6,4 @@
 #define START_MAIL_INPUT "354 End mail with single .\n"
 
 #define SYNTAX_ERROR "500 Syntax error!\n"
+#define BAD_SEQUENCE "503 Bad sequence of commands!\n"

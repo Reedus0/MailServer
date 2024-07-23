@@ -59,8 +59,15 @@ static char* get_mail_content(SOCKET sock, char* buffer) {
 	return message;
 }
 
+enum server_states {
+	DEFAULT = 0,
+	HAS_FROM = 1,
+	HAS_RCPT = 2,
+};
+
 void serve_connection(SOCKET sock) {
 	int status = 0;
+	int current_state = DEFAULT;
 	char* buffer = calloc(BUFFER_SIZE, sizeof(char));
 
 	send_code_response(sock, buffer, SERVICE_READY);
@@ -95,20 +102,34 @@ void serve_connection(SOCKET sock) {
 
 			status = send_code_response(sock, buffer, ACTION_OK);
 			if (status == -1) break;
+
+			current_state |= HAS_FROM;
 			continue;
 		}
 
 		if (check_message_command("RCPT TO:", buffer)) {
+			if (current_state != HAS_FROM) {
+				status = send_code_response(sock, buffer, BAD_SEQUENCE);
+				if (status == -1) break;
+				continue;
+			}
 			char* rcpt_to = get_value_from_message(buffer, strlen("RCPT TO:"));
 			new_mail.rcpt_to = rcpt_to;
 			printf("%s", new_mail.rcpt_to);
 
 			status = send_code_response(sock, buffer, ACTION_OK);
 			if (status == -1) break;
+
+			current_state |= HAS_RCPT;
 			continue;
 		}
 
 		if (check_message_command("DATA", buffer)) {
+			if (current_state != (HAS_FROM | HAS_RCPT)) {
+				status = send_code_response(sock, buffer, BAD_SEQUENCE);
+				if (status == -1) break;
+				continue;
+			}
 			status = send_code_response(sock, buffer, START_MAIL_INPUT);
 			if (status == -1) break;
 
@@ -119,6 +140,8 @@ void serve_connection(SOCKET sock) {
 
 			status = send_code_response(sock, buffer, ACTION_OK);
 			if (status == -1) break;
+
+			current_state = DEFAULT;
 			continue;
 		}
 
