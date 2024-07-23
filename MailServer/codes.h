@@ -1,0 +1,8 @@
+#pragma once
+#define SERVICE_READY "220"
+#define SERVICE_CLOSING_TRANSMISSION "221"
+#define ACTION_OK "250"
+
+#define START_MAIL_INPUT "354"
+
+#define SYNTAX_ERROR "500"
