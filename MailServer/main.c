@@ -4,15 +4,22 @@
 #include <ws2tcpip.h>
 #include "header.h"
 #include "server.h"
+#include "mail.h"
+#include "delivery.h"
 #pragma comment(lib, "ws2_32.lib")
 
 int main(int argv, char* argc[]) {
 
-    mtx_t mutex;
-    thrd_t worker_threads[MAX_CONNECTIONS];
+    thrd_t new_thread;
     WSADATA wsa_data;
 
-    mtx_init(&mutex, mtx_plain);
+    //struct raw_mail mail = init_raw_mail();
+    //mail.data = "Subject: Mail subject\nDate: now\n\nMail text";
+    //mail.mail_from = "src@mail";
+    //mail.rcpt_to_arr[0] = "rcpt_1@mail";
+    //mail.rcpt_count = 1;
+    //deliver_mail(mail);
+    //return 0;
 
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -20,21 +27,18 @@ int main(int argv, char* argc[]) {
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = INADDR_ANY;
-    server_address.sin_port = htons(1025);
+    server_address.sin_port = htons(LISTEN_PORT);
 
     bind(sock, (struct sockaddr*)&server_address, sizeof(server_address));
-    listen(sock, MAX_CONNECTIONS);
+    listen(sock, MAX_PENDING_CONNECTIONS);
 
     while (1) {
         SOCKET new_sock = accept(sock, NULL, NULL);
         if (new_sock == -1) {
             continue;
         }
-        thrd_create(&worker_threads[0], serve_connection, new_sock);
-        thrd_join(worker_threads[0], NULL);
+        thrd_create(&new_thread, serve_connection, new_sock);
     }
 
-	// thrd_create(&worker_threads[0], hello, NULL);
-	// thrd_join(worker_threads[0], NULL);
 	return 0;
 }
