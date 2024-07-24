@@ -76,7 +76,7 @@ static int serve_helo(SOCKET sock, char* buffer, struct raw_mail* raw_mail) {
 	int status = 0;
 	int message_length = strlen(buffer) - 1;
 
-	if (message_length == strlen("HELO")) {
+	if (message_length == strlen("HELO ")) {
 		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		if (status == -1) return -1;
 		return 0;
@@ -103,7 +103,7 @@ static int serve_mail_from(SOCKET sock, char* buffer, struct raw_mail* raw_mail)
 	int status = 0;
 	int message_length = strlen(buffer) - 1;
 
-	if (message_length == strlen("MAIL FROM:")) {
+	if (message_length == strlen("MAIL FROM: ")) {
 		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		if (status == -1) return -1;
 		return 0;
@@ -148,7 +148,7 @@ static int serve_rcpt_to(SOCKET sock, char* buffer, struct raw_mail* raw_mail, e
 		return 0;
 	}
 
-	if (message_length == strlen("RCPT TO:")) {
+	if (message_length == strlen("RCPT TO: ")) {
 		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		if (status == -1) return -1;
 		return 0;
@@ -252,35 +252,35 @@ void serve_connection(SOCKET sock) {
 
 		int message_length = strlen(buffer) - 1;
 
-		if (check_message_command("QUIT", buffer)) {
+		if (check_message_command("QUIT ", buffer)) {
 			serve_quit(sock, buffer);
 			break;
 		}
 
-		if (check_message_command("HELO", buffer)) {
+		if (check_message_command("HELO ", buffer)) {
 			status = serve_helo(sock, buffer, &raw_mail);
 			if (status == -1) break;
 			continue;
 		}
 
-		if (check_message_command("MAIL FROM:", buffer)) {
+		if (check_message_command("MAIL FROM: ", buffer)) {
 			status = serve_mail_from(sock, buffer, &raw_mail);
 			if (status == -1) break;
-			current_state |= HAS_FROM;
+			if (status == 1) current_state |= HAS_FROM;
 			continue;
 		}
 
-		if (check_message_command("RCPT TO:", buffer)) {
+		if (check_message_command("RCPT TO: ", buffer)) {
 			status = serve_rcpt_to(sock, buffer, &raw_mail, current_state);
 			if (status == -1) break;
-			current_state |= HAS_TO;
+			if (status == 1) current_state |= HAS_TO;
 			continue;
 		}
 
 		if (check_message_command("DATA", buffer)) {
 			status = serve_data(sock, buffer, &raw_mail, current_state);
 			if (status == -1) break;
-			current_state = DEFAULT;
+			if (status == 1) current_state = DEFAULT;
 			continue;
 		}
 

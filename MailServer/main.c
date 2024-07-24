@@ -13,14 +13,14 @@ int main(int argv, char* argc[]) {
     thrd_t new_thread;
     WSADATA wsa_data;
 
-    struct raw_mail mail = init_raw_mail();
-    mail.data = "Subject: Mail subject\nDate: now\n\nMail text\n";
+    //struct raw_mail mail = init_raw_mail();
+    //mail.data = "Subject: Mail subject\nDate: now\n\nMail text\n";
     //mail.data = "Mail text\n";
-    mail.mail_from = "src@mail";
-    mail.rcpt_to_arr[0] = "rcpt_1@mail";
-    mail.rcpt_count = 1;
-    deliver_mail(mail);
-    return 0;
+    //mail.mail_from = "john@domain";
+    //mail.rcpt_to_arr[0] = "john@domain";
+    //mail.rcpt_count = 1;
+    //deliver_mail(mail);
+    //return 0;
 
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);

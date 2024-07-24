@@ -23,9 +23,25 @@ int check_message_command(char* command, char* message) {
 	return !memcmp(message, command, strlen(command));
 }
 
-char* trim_string(char* string) {
+static char* ltrim(char* string) {
 	while (isspace(*string)) string++;
 	return string;
+}
+
+static char* rtrim(char* string) {
+	char* back = string + strlen(string);
+	while (isspace(*--back));
+	*(back + 1) = '\0';
+	return string;
+}
+
+char* trim_string(char* string)
+{
+	char* left_trim = ltrim(string);
+	if (is_empty_string(left_trim)) {
+		return left_trim;
+	}
+	return rtrim(left_trim);
 }
 
 int is_empty_string(char* string) {
