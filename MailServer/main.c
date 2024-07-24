@@ -6,6 +6,7 @@
 #include "server.h"
 #include "mail.h"
 #include "delivery.h"
+#include "message.h"
 #pragma comment(lib, "ws2_32.lib")
 
 int main(int argv, char* argc[]) {
@@ -14,7 +15,8 @@ int main(int argv, char* argc[]) {
     WSADATA wsa_data;
 
     //struct raw_mail mail = init_raw_mail();
-    //mail.data = "Subject: Mail subject\nDate: now\n\nMail text";
+    //mail.data = "Subject: Mail subject\nDate: now\n\nMail text\n";
+    //mail.data = "Mail text\n";
     //mail.mail_from = "src@mail";
     //mail.rcpt_to_arr[0] = "rcpt_1@mail";
     //mail.rcpt_count = 1;

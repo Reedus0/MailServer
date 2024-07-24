@@ -13,6 +13,7 @@ struct raw_mail {
 };
 
 struct raw_mail init_raw_mail();
+struct raw_mail clean_raw_mail(struct raw_mail raw_mail);
 
 struct mail_header {
 	char* name;
@@ -27,4 +28,4 @@ struct mail {
 
 
 struct mail init_mail();
-char* build_mail(struct mail mail);
+struct mail clean_mail(struct mail mail);
