@@ -13,7 +13,8 @@ struct raw_mail {
 };
 
 struct raw_mail init_raw_mail();
-struct raw_mail clean_raw_mail(struct raw_mail raw_mail);
+int clean_raw_mail(struct raw_mail* raw_mail);
+int raw_mail_add_recipient(struct raw_mail* raw_mail, char* recipient);
 
 struct mail_header {
 	char* name;
@@ -26,6 +27,8 @@ struct mail {
 	int headers_count;
 };
 
-
 struct mail init_mail();
-struct mail clean_mail(struct mail mail);
+int mail_add_header(struct mail* mail, char* name, char* value);
+int mail_set_text(struct mail* mail, char* text);
+char* build_mail(struct mail* mail);
+int clean_mail(struct mail* mail);

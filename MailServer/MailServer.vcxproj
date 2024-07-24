@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="delivery.c" />
+    <ClCompile Include="email.c" />
     <ClCompile Include="mail.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="message.c" />
@@ -138,6 +139,7 @@
   <ItemGroup>
     <ClInclude Include="codes.h" />
     <ClInclude Include="delivery.h" />
+    <ClInclude Include="email.h" />
     <ClInclude Include="header.h" />
     <ClInclude Include="mail.h" />
     <ClInclude Include="message.h" />
