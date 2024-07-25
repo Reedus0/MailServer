@@ -47,13 +47,7 @@ int clean_smtp_request(struct smtp_request* smtp_request) {
 	for (int i = 0; i < smtp_request->rcpt_count; i++) {
 		struct email_address* current_recipient = smtp_request->rcpt_to_arr[i];
 		clean_email_address(current_recipient);
-		smtp_request->rcpt_to_arr[i] = NULL;
 	}
-
-	smtp_request->mail_from = NULL;
-	smtp_request->domain = NULL;
-	smtp_request->data = NULL;
-	smtp_request->rcpt_count = 0;
 
 	free(smtp_request);
 	return 1;

@@ -38,12 +38,12 @@ struct email_address* string_to_email_address(char* string) {
 	return email_address;
 }
 char* email_address_to_string(struct email_address* email_address) {
-	int string_length = strlen(email_address->user) + strlen(email_address->domain) + 1;
-	char* result = calloc(string_length + 1, sizeof(char));
+	int user_length = strlen(email_address->user);
+	int domain_length = strlen(email_address->domain) + 1;
 
-	add_to_buffer(result, email_address->user);
-	add_to_buffer(result, "@");
-	add_to_buffer(result, email_address->domain);
+	char* result = calloc(user_length + domain_length + 2, sizeof(char));
+
+	flush_to_buffer(result, user_length + domain_length + 1, "%s@%s", email_address->user, email_address->domain);
 
 	return result;
 }
@@ -51,9 +51,6 @@ char* email_address_to_string(struct email_address* email_address) {
 int clean_email_address(struct email_address* email_address) {
 	free(email_address->user);
 	free(email_address->domain);
-
-	email_address->user = NULL;
-	email_address->domain = NULL;
 
 	free(email_address);
 	return 1;

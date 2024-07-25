@@ -7,14 +7,14 @@
 #include "buffer.h"
 #include "config.h"
 
-static int parse_single_header(struct mail* mail, char* header_line) {
+static int add_single_header(struct mail* mail, char* header_line) {
 
 	char* separator = strchr(header_line, ':');
 
 	char* new_name = get_field_from_buffer(header_line, (separator - header_line));
 	char* new_value = get_value_from_buffer(header_line, (separator - header_line) + 1);
 
-	mail_add_header(mail, new_name, new_value);
+	return mail_add_header(mail, new_name, new_value);
 }
 
 static char* get_header_line(char* mait_text) {
@@ -44,7 +44,10 @@ static int mail_parse_headers(struct mail* mail, char* mail_text) {
 			return 0;
 		}
 
-		parse_single_header(mail, current_line);
+		if (!add_single_header(mail, current_line)) {
+			return 0;
+		}
+		
 		free(current_line);
 
 		base_line = char_pointer + 1;
@@ -56,9 +59,9 @@ static int mail_parse_headers(struct mail* mail, char* mail_text) {
 
 static int mail_get_text(struct mail* mail, char* mail_text) {
 
-
 	if (mail->headers_count == 0) {
-		mail_set_text(mail, mail_text);
+		char* new_text = copy_buffer(mail_text);
+		mail_set_text(mail, new_text);
 		return 1;
 	}
 

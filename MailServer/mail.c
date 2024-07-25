@@ -78,10 +78,6 @@ int clean_mail(struct mail* mail) {
 		clean_mail_header(current_header);
 	}
 
-	mail->text = NULL;
-	mail->timestamp = NULL;
-	mail->headers_count = 0;
-
 	free(mail);
 	return 1;
 }

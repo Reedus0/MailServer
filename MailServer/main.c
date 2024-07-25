@@ -4,18 +4,18 @@
 #include <ws2tcpip.h>
 #include "header.h"
 #include "server.h"
-#include "smtp_request.h"
-#include "delivery.h"
 #include "config.h"
 #pragma comment(lib, "ws2_32.lib")
 
+#if DEBUG_DELIVERY == 1
+#include "smtp_request.h"
+#include "delivery.h"
+#include "email_address.h"
+#endif
+
 int main(int argv, char* argc[]) {
 
-    thrd_t new_thread;
-    WSADATA wsa_data;
-
-    struct config config = config_parse_file("config.txt");
-
+#if DEBUG_DELIVERY == 1
     struct smtp_request* smtp_request = init_smtp_request();
 
     char* _data = "Subject: Mail subject\nDate: now\n\nMail text\n";
@@ -36,7 +36,14 @@ int main(int argv, char* argc[]) {
 
     deliver_mail(smtp_request);
     clean_smtp_request(smtp_request);
+
     return 0;
+#endif
+
+    thrd_t new_thread;
+    WSADATA wsa_data;
+
+    struct config config = config_parse_file("config.txt");
 
     int status = WSAStartup(MAKEWORD(2, 2), &wsa_data);
     if (status != 0) {

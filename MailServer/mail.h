@@ -10,10 +10,10 @@ struct mail_header {
 };
 
 struct mail {
+	char* text;
+	char* timestamp;
 	struct mail_header* headers[HEADERS_COUNT];
 	int headers_count;
-	char* timestamp;
-	char* text;
 };
 
 struct mail* init_mail();
