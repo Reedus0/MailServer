@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "mail.h"
 #include "smtp_request.h"
 #include "message.h"
+#include "config.h"
 
 static int parse_single_header(struct mail* mail, char* header_line) {
 
@@ -37,9 +39,11 @@ static int mail_parse_headers(struct mail* mail, char* mail_text) {
 	char* base_line = mail_text;
 	while (base_line != end_of_headers + 1) {
 		char* current_line = get_header_line(base_line);
+
 		if (current_line == NULL) {
 			return 0;
 		}
+
 		parse_single_header(mail, current_line);
 		free(current_line);
 
@@ -51,7 +55,7 @@ static int mail_parse_headers(struct mail* mail, char* mail_text) {
 }
 
 static int mail_get_text(struct mail* mail, char* mail_text) {
-	
+
 	if (mail->headers_count == 0) {
 		mail_set_text(mail, mail_text);
 		return 1;
@@ -62,7 +66,44 @@ static int mail_get_text(struct mail* mail, char* mail_text) {
 	return 1;
 }
 
+static int mail_get_timestamp(struct mail* mail, char* domain) {
+	struct config config = config_parse_file("config.txt");
+
+	char* user_domain;
+
+	if (domain == NULL) {
+		char* unknown_domain = "UNKNOWN";
+		user_domain = calloc(strlen(unknown_domain) + 1, sizeof(char));
+		memcpy(user_domain, unknown_domain, strlen(unknown_domain));
+	}
+	else {
+		user_domain = calloc(strlen(domain) + 1, sizeof(char));
+		memcpy(user_domain, domain, strlen(domain));
+	}
+
+	char* server_domain = config_get_domain(&config);
+
+	time_t current_time = time(NULL);
+	char* time_string = ctime(&current_time);
+
+	*(time_string + strlen(time_string) - 1) = 0;
+
+	char* timestamp = calloc(TIMESTAMP_SIZE, sizeof(char));
+
+	add_to_message(timestamp, "Recieved: from ");
+	add_to_message(timestamp, user_domain);
+	add_to_message(timestamp, " by SMTP server at ");
+	add_to_message(timestamp, server_domain);
+	add_to_message(timestamp, "; ");
+	add_to_message(timestamp, time_string);
+	add_to_message(timestamp, "\n");
+
+	mail_set_timestamp(mail, timestamp);
+	return 1;
+}
+
 int format_mail(struct mail* mail, struct smtp_request* smtp_request) {
+	mail_get_timestamp(mail, smtp_request->domain);
 	mail_parse_headers(mail, smtp_request->data);
 	mail_get_text(mail, smtp_request->data);
 

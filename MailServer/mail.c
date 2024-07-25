@@ -5,6 +5,7 @@
 struct mail init_mail() {
 	struct mail new_mail;
 	new_mail.text = NULL;
+	new_mail.timestamp = NULL;
 	new_mail.headers_count = 0;
 	
 	for (int i = 0; i < HEADERS_COUNT; i++) {
@@ -39,8 +40,16 @@ int mail_set_text(struct mail* mail, char* text) {
 	return 1;
 }
 
+int mail_set_timestamp(struct mail* mail, char* timestamp) {
+	char* mail_timestamp = calloc(strlen(timestamp) + 1, sizeof(char));
+	memcpy(mail_timestamp, timestamp, strlen(timestamp));
+	mail->timestamp = mail_timestamp;
+	return 1;
+}
+
 char* build_mail(struct mail* mail) {
 	char* result = calloc(MAIL_SIZE, sizeof(char));
+	add_to_message(result, mail->timestamp);
 	for (int i = 0; i < mail->headers_count; i++) {
 		struct mail_header current_header = mail->headers[i];
 		add_to_message(result, current_header.name);
@@ -58,6 +67,7 @@ char* build_mail(struct mail* mail) {
 
 int clean_mail(struct mail* mail) {
 	free(mail->text);
+	free(mail->timestamp);
 
 	for (int i = 0; i < mail->headers_count; i++) {
 		struct mail_header* current_header = &mail->headers[i];
@@ -68,6 +78,7 @@ int clean_mail(struct mail* mail) {
 	}
 
 	mail->text = NULL;
+	mail->timestamp = NULL;
 	mail->headers_count = 0;
 	return 1;
 }

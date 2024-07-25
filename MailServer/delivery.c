@@ -22,11 +22,13 @@ void deliver_mail(struct smtp_request smtp_request) {
 	
 	for (int i = 0; i < smtp_request.rcpt_count; i++) {
 		struct email_address recipient = smtp_request.rcpt_to_arr[i];
+
 		if (recipient.user != NULL && recipient.domain != NULL) {
 			char* final_text = build_mail(&mail);
 			write_mail_to_file(recipient.user, final_text);
 			free(final_text);
 		}
+
 	}
 
 	clean_mail(&mail);

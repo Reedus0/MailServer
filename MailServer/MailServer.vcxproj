@@ -128,6 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="config.c" />
     <ClCompile Include="delivery.c" />
     <ClCompile Include="email_address.c" />
     <ClCompile Include="mail.c" />
@@ -139,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="codes.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="delivery.h" />
     <ClInclude Include="email_address.h" />
     <ClInclude Include="header.h" />

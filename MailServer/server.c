@@ -10,6 +10,7 @@
 #include "delivery.h"
 #include "server.h"
 #include "email_address.h"
+#include "config.h"
 
 static void clear_buffer(char* buffer) {
 	memset(buffer, 0, BUFFER_SIZE);
@@ -42,7 +43,7 @@ static int check_domain(char* domain, char* server_domain) {
 	return !memcmp(domain, server_domain, strlen(server_domain));
 }
 
-static int check_user(char* user, char* server_users[]) {
+static int check_user(char* user, char** server_users) {
 	for (int i = 0; i < 2; i++) {
 		char* current_user = server_users[i];
 		if (strlen(current_user) != strlen(user)) {
@@ -147,11 +148,10 @@ static int serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_re
 	int status = 0;
 	int message_length = strlen(buffer) - 1;
 
-	char* server_domain = "domain";
-	char* server_users[2] = {
-		"john",
-		"lol"
-	};
+	struct config config = config_parse_file("config.txt");
+
+	char* server_domain = config_get_domain(&config);
+	char** server_users = config_get_users(&config);
 
 	if (!(current_state & HAS_FROM)) {
 		status = send_response(sock, buffer, BAD_SEQUENCE);

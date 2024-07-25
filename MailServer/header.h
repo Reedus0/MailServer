@@ -1,5 +1,4 @@
 #pragma once
 
-#define LISTEN_PORT 1025
 #define BUFFER_SIZE 128
 #define MAX_PENDING_CONNECTIONS 8

@@ -42,6 +42,9 @@
     <ClCompile Include="email_address.c">
       <Filter>Исходные файлы\structures</Filter>
     </ClCompile>
+    <ClCompile Include="config.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header.h">
@@ -70,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="email_address.h">
       <Filter>Исходные файлы\structures</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

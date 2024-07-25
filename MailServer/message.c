@@ -36,8 +36,7 @@ static char* rtrim(char* string) {
 	return string;
 }
 
-char* trim_string(char* string)
-{
+char* trim_string(char* string) {
 	char* left_trim = ltrim(string);
 	if (is_empty_string(left_trim)) {
 		return left_trim;
