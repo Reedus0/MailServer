@@ -56,13 +56,15 @@ static int mail_parse_headers(struct mail* mail, char* mail_text) {
 
 static int mail_get_text(struct mail* mail, char* mail_text) {
 
+
 	if (mail->headers_count == 0) {
 		mail_set_text(mail, mail_text);
 		return 1;
 	}
 
 	char* text_pointer = strstr(mail_text, "\n\n");
-	mail_set_text(mail, text_pointer + 2);
+	char* new_text = copy_buffer(text_pointer + 2);
+	mail_set_text(mail, new_text);
 	return 1;
 }
 
@@ -105,7 +107,6 @@ static int mail_get_timestamp(struct mail* mail, char* domain) {
 
 	mail_set_timestamp(mail, timestamp);
 
-	free(timestamp);
 	return 1;
 }
 

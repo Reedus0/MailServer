@@ -16,6 +16,12 @@ void flush_to_buffer(char* buffer, int size, char* format, ...) {
 	va_end(va);
 }
 
+char* copy_buffer(char* buffer) {
+	char* result = calloc(strlen(buffer) + 1, sizeof(char));
+	memcpy(result, buffer, strlen(buffer));
+	return result;
+}
+
 char* get_field_from_buffer(char* message, int offset) {
 	char* result = calloc(offset + 1, sizeof(char));
 	memcpy(result, message, offset);

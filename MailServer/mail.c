@@ -36,29 +36,20 @@ struct mail* init_mail() {
 int mail_add_header(struct mail* mail, char* name, char* value) {
 	if (mail->headers_count >= HEADERS_COUNT) return 0;
 
-	char* new_name = calloc(strlen(name) + 1, sizeof(char));
-	memcpy(new_name, name, strlen(name));
-	mail->headers[mail->headers_count]->name = new_name;
-
-	char* new_value = calloc(strlen(value) + 1, sizeof(char));
-	memcpy(new_value, value, strlen(value));
-	mail->headers[mail->headers_count]->value = new_value;
+	mail->headers[mail->headers_count]->name = name;
+	mail->headers[mail->headers_count]->value = value;
 
 	mail->headers_count += 1;
 	return 1;
 }
 
 int mail_set_text(struct mail* mail, char* text) {
-	char* mail_text = calloc(MAIL_SIZE, sizeof(char));
-	memcpy(mail_text, text, strlen(text));
-	mail->text = mail_text;
+	mail->text = text;
 	return 1;
 }
 
 int mail_set_timestamp(struct mail* mail, char* timestamp) {
-	char* mail_timestamp = calloc(strlen(timestamp) + 1, sizeof(char));
-	memcpy(mail_timestamp, timestamp, strlen(timestamp));
-	mail->timestamp = mail_timestamp;
+	mail->timestamp = timestamp;
 	return 1;
 }
 

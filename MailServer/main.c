@@ -16,15 +16,27 @@ int main(int argv, char* argc[]) {
 
     struct config config = config_parse_file("config.txt");
 
-    //struct smtp_request smtp_request = init_smtp_request();
-    //smtp_request.data = "Subject: Mail subject\nDate: now\n\nMail text\n";
-    //smtp_request.data = "Mail text\n";
-    //smtp_request.mail_from = string_to_email_address("john@domain.local");
-    //smtp_request.rcpt_to_arr[0] = string_to_email_address("john@domain.local");
-    //smtp_request.rcpt_count = 1;
-    //deliver_mail(smtp_request);
-    //clean_smtp_request(&smtp_request);
-    //return 0;
+    struct smtp_request* smtp_request = init_smtp_request();
+
+    char* _data = "Subject: Mail subject\nDate: now\n\nMail text\n";
+    char* data = calloc(strlen(_data) + 1, sizeof(char));
+    memcpy(data, _data, strlen(_data));
+    smtp_request->data = data;
+
+    char* _mail_from = "john@domain.local";
+    char* mail_from = calloc(strlen(_mail_from) + 1, sizeof(char));
+    memcpy(mail_from, _mail_from, strlen(_mail_from));
+    smtp_request->mail_from = string_to_email_address(_mail_from);
+
+    char* _rcpt_to = "john@domain.local";
+    char* rcpt_to = calloc(strlen(_rcpt_to) + 1, sizeof(char));
+    memcpy(rcpt_to, _rcpt_to, strlen(_rcpt_to));
+    smtp_request->rcpt_to_arr[0] = string_to_email_address(rcpt_to);
+    smtp_request->rcpt_count = 1;
+
+    deliver_mail(smtp_request);
+    clean_smtp_request(smtp_request);
+    return 0;
 
     int status = WSAStartup(MAKEWORD(2, 2), &wsa_data);
     if (status != 0) {
