@@ -2,7 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mail.h"
+#include "smtp_request.h"
 #include "message.h"
+
+static int parse_single_header(struct mail* mail, char* header_line) {
+
+	char* separator = strchr(header_line, ':');
+
+	char* new_name = get_field_from_message(header_line, (separator - header_line));
+	char* new_value = get_value_from_message(header_line, (separator - header_line) + 1);
+
+	mail_add_header(mail, new_name, new_value);
+}
 
 static char* get_header_line(char* mait_text) {
 	char* end_of_line = strchr(mait_text, '\n') + 1;
@@ -20,17 +31,7 @@ static char* get_header_line(char* mait_text) {
 	return header_line;
 }
 
-static int parse_single_header(struct mail* mail, char* header_line) {
-
-	char* separator = strchr(header_line, ':');
-
-	char* new_name = get_field_from_message(header_line, (separator - header_line));
-	char* new_value = get_value_from_message(header_line, (separator - header_line) + 1);
-
-	mail_add_header(mail, new_name, new_value);
-}
-
-int parse_headers(struct mail* mail, char* mail_text) {
+static int mail_parse_headers(struct mail* mail, char* mail_text) {
 	char* char_pointer = strchr(mail_text, '\n');
 	char* end_of_headers = strstr(mail_text, "\n\n");
 	char* base_line = mail_text;
@@ -49,7 +50,7 @@ int parse_headers(struct mail* mail, char* mail_text) {
 	return 1;
 }
 
-int get_mail_text(struct mail* mail, char* mail_text) {
+static int mail_get_text(struct mail* mail, char* mail_text) {
 	
 	if (mail->headers_count == 0) {
 		mail_set_text(mail, mail_text);
@@ -58,5 +59,12 @@ int get_mail_text(struct mail* mail, char* mail_text) {
 
 	char* text_pointer = strstr(mail_text, "\n\n");
 	mail_set_text(mail, text_pointer + 2);
+	return 1;
+}
+
+int format_mail(struct mail* mail, struct smtp_request* smtp_request) {
+	mail_parse_headers(mail, smtp_request->data);
+	mail_get_text(mail, smtp_request->data);
+
 	return 1;
 }

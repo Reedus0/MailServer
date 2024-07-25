@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Исходные файлы\structures">
+      <UniqueIdentifier>{a964b0b9-b961-4a23-9f69-c21a9bd81b77}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -27,14 +30,17 @@
     <ClCompile Include="delivery.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="mail.c">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="format.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="email.c">
-      <Filter>Исходные файлы</Filter>
+    <ClCompile Include="mail.c">
+      <Filter>Исходные файлы\structures</Filter>
+    </ClCompile>
+    <ClCompile Include="smtp_request.c">
+      <Filter>Исходные файлы\structures</Filter>
+    </ClCompile>
+    <ClCompile Include="email_address.c">
+      <Filter>Исходные файлы\structures</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -50,17 +56,20 @@
     <ClInclude Include="message.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="mail.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="delivery.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="format.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="email.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="smtp_request.h">
+      <Filter>Исходные файлы\structures</Filter>
+    </ClInclude>
+    <ClInclude Include="mail.h">
+      <Filter>Исходные файлы\structures</Filter>
+    </ClInclude>
+    <ClInclude Include="email_address.h">
+      <Filter>Исходные файлы\structures</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

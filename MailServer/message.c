@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <malloc.h>
+#include <ctype.h>
 
 void add_to_message(char* buffer, char* message) {
 	memcpy(buffer + strlen(buffer), message, strlen(message) + 1);
@@ -19,7 +20,7 @@ char* get_value_from_message(char* message, int offset) {
 	return result;
 }
 
-int check_message_command(char* command, char* message) {
+int message_has_command(char* command, char* message) {
 	return !memcmp(message, command, strlen(command));
 }
 

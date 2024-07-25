@@ -4,7 +4,7 @@
 #include <ws2tcpip.h>
 #include "header.h"
 #include "server.h"
-#include "mail.h"
+#include "smtp_request.h"
 #include "delivery.h"
 #pragma comment(lib, "ws2_32.lib")
 
@@ -13,14 +13,14 @@ int main(int argv, char* argc[]) {
     thrd_t new_thread;
     WSADATA wsa_data;
 
-    //struct raw_mail mail = init_raw_mail();
-    //mail.data = "Subject: Mail subject\nDate: now\n\nMail text\n";
+    struct smtp_request smtp_request = init_smtp_request();
+    smtp_request.data = "Subject: Mail subject\nDate: now\n\nMail text\n";
     //mail.data = "Mail text\n";
-    //mail.mail_from = "john@domain";
-    //mail.rcpt_to_arr[0] = "john@domain";
-    //mail.rcpt_count = 1;
-    //deliver_mail(mail);
-    //return 0;
+    smtp_request.mail_from = string_to_email_address("john@domain");
+    smtp_request.rcpt_to_arr[0] = string_to_email_address("john@domain");
+    smtp_request.rcpt_count = 1;
+    deliver_mail(smtp_request);
+    return 0;
 
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);

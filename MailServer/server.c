@@ -6,10 +6,10 @@
 #include "header.h"
 #include "message.h"
 #include "codes.h"
-#include "mail.h"
+#include "smtp_request.h"
 #include "delivery.h"
 #include "server.h"
-#include "email.h"
+#include "email_address.h"
 
 static void clear_buffer(char* buffer) {
 	memset(buffer, 0, BUFFER_SIZE);
@@ -55,8 +55,8 @@ static int check_user(char* user, char* server_users[]) {
 	return 0;
 }
 
-static char* get_mail_content(SOCKET sock, char* buffer) {
-	char* message = calloc(MAIL_SIZE, sizeof(char));
+static char* get_smtp_data(SOCKET sock, char* buffer) {
+	char* message = calloc(SMTP_REQUEST_MAIL_SIZE, sizeof(char));
 	while (1) {
 		int status = get_message(sock, buffer);
 		if (status == -1) break;
@@ -72,7 +72,7 @@ static int serve_quit(SOCKET sock, char* buffer) {
 	send_response(sock, buffer, SERVICE_CLOSING_TRANSMISSION);
 }
 
-static int serve_helo(SOCKET sock, char* buffer, struct raw_mail* raw_mail) {
+static int serve_helo(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
 	int status = 0;
 	int message_length = strlen(buffer) - 1;
 
@@ -91,7 +91,7 @@ static int serve_helo(SOCKET sock, char* buffer, struct raw_mail* raw_mail) {
 		return 0;
 	}
 
-	raw_mail->domain = domain;
+	smtp_request->domain = domain;
 
 	status = send_response(sock, buffer, ACTION_OK);
 	if (status == -1) return -1;
@@ -99,7 +99,7 @@ static int serve_helo(SOCKET sock, char* buffer, struct raw_mail* raw_mail) {
 	return 1;
 }
 
-static int serve_mail_from(SOCKET sock, char* buffer, struct raw_mail* raw_mail) {
+static int serve_mail_from(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
 	int status = 0;
 	int message_length = strlen(buffer) - 1;
 
@@ -118,13 +118,13 @@ static int serve_mail_from(SOCKET sock, char* buffer, struct raw_mail* raw_mail)
 		return 0;
 	}
 
-	if (!validate_email(mail_from)) {
+	if (!validate_email_string(mail_from)) {
 		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		if (status == -1) return -1;
 		return 0;
 	}
 
-	raw_mail->mail_from = mail_from;
+	smtp_request->mail_from = string_to_email_address(mail_from);
 
 	status = send_response(sock, buffer, ACTION_OK);
 	if (status == -1) return -1;
@@ -132,7 +132,7 @@ static int serve_mail_from(SOCKET sock, char* buffer, struct raw_mail* raw_mail)
 	return 1;
 }
 
-static int serve_rcpt_to(SOCKET sock, char* buffer, struct raw_mail* raw_mail, enum server_states current_state) {
+static int serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_request, enum server_states current_state) {
 	int status = 0;
 	int message_length = strlen(buffer) - 1;
 
@@ -163,33 +163,27 @@ static int serve_rcpt_to(SOCKET sock, char* buffer, struct raw_mail* raw_mail, e
 		return 0;
 	}
 
-	if (!validate_email(rcpt_to)) {
+	if (!validate_email_string(rcpt_to)) {
 		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		if (status == -1) return -1;
 		return 0;
 	}
 
-	char* to_domain = get_email_domain(rcpt_to);
+	struct email_address rcpt_to_email_address = string_to_email_address(rcpt_to);
 
-	if (!check_domain(to_domain, server_domain)) {
+	if (!check_domain(rcpt_to_email_address.domain, server_domain)) {
 		status = send_response(sock, buffer, USER_NOT_LOCAL);
 		if (status == -1) return -1;
 		return 0;
 	}
 
-	free(to_domain);
-
-	char* to_user = get_email_user(rcpt_to);
-
-	if (!check_user(to_user, server_users)) {
+	if (!check_user(rcpt_to_email_address.user, server_users)) {
 		status = send_response(sock, buffer, USER_NOT_LOCAL);
 		if (status == -1) return -1;
 		return 0;
 	}
 
-	free(to_user);
-
-	if (!raw_mail_add_recipient(raw_mail, rcpt_to)) {
+	if (!smtp_request_add_recipient(smtp_request, rcpt_to_email_address)) {
 		status = send_response(sock, buffer, TRANSACTION_FAILED);
 		if (status == -1) return -1;
 		return 0;
@@ -201,7 +195,7 @@ static int serve_rcpt_to(SOCKET sock, char* buffer, struct raw_mail* raw_mail, e
 	return 1;
 }
 
-static int serve_data(SOCKET sock, char* buffer, struct raw_mail* raw_mail, enum server_states current_state) {
+static int serve_data(SOCKET sock, char* buffer, struct smtp_request* smtp_request, enum server_states current_state) {
 	int status = 0;
 	int message_length = strlen(buffer) - 1;
 
@@ -220,14 +214,14 @@ static int serve_data(SOCKET sock, char* buffer, struct raw_mail* raw_mail, enum
 	status = send_response(sock, buffer, START_MAIL_INPUT);
 	if (status == -1) return -1;
 
-	char* message = get_mail_content(sock, buffer);
-	raw_mail->data = message;
+	char* smtp_data = get_smtp_data(sock, buffer);
+	smtp_request->data = smtp_data;
 
 	status = send_response(sock, buffer, ACTION_OK);
 	if (status == -1) return -1;
 
-	deliver_mail(*raw_mail);
-	clean_raw_mail(raw_mail);
+	deliver_mail(*smtp_request);
+	clean_smtp_request(smtp_request);
 
 	return 1;
 }
@@ -241,7 +235,7 @@ void serve_connection(SOCKET sock) {
 
 	send_response(sock, buffer, SERVICE_READY);
 
-	struct raw_mail raw_mail = init_raw_mail();
+	struct smtp_request smtp_request = init_smtp_request();
 
 	while (1) {
 
@@ -252,33 +246,33 @@ void serve_connection(SOCKET sock) {
 
 		int message_length = strlen(buffer) - 1;
 
-		if (check_message_command("QUIT ", buffer)) {
+		if (message_has_command("QUIT ", buffer)) {
 			serve_quit(sock, buffer);
 			break;
 		}
 
-		if (check_message_command("HELO ", buffer)) {
-			status = serve_helo(sock, buffer, &raw_mail);
+		if (message_has_command("HELO ", buffer)) {
+			status = serve_helo(sock, buffer, &smtp_request);
 			if (status == -1) break;
 			continue;
 		}
 
-		if (check_message_command("MAIL FROM: ", buffer)) {
-			status = serve_mail_from(sock, buffer, &raw_mail);
+		if (message_has_command("MAIL FROM: ", buffer)) {
+			status = serve_mail_from(sock, buffer, &smtp_request);
 			if (status == -1) break;
 			if (status == 1) current_state |= HAS_FROM;
 			continue;
 		}
 
-		if (check_message_command("RCPT TO: ", buffer)) {
-			status = serve_rcpt_to(sock, buffer, &raw_mail, current_state);
+		if (message_has_command("RCPT TO: ", buffer)) {
+			status = serve_rcpt_to(sock, buffer, &smtp_request, current_state);
 			if (status == -1) break;
 			if (status == 1) current_state |= HAS_TO;
 			continue;
 		}
 
-		if (check_message_command("DATA", buffer)) {
-			status = serve_data(sock, buffer, &raw_mail, current_state);
+		if (message_has_command("DATA", buffer)) {
+			status = serve_data(sock, buffer, &smtp_request, current_state);
 			if (status == -1) break;
 			if (status == 1) current_state = DEFAULT;
 			continue;

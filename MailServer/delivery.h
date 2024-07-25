@@ -1,3 +1,3 @@
 #pragma once
 
-void deliver_mail(struct raw_mail mail);
+void deliver_mail(struct smtp_request mail);

@@ -129,22 +129,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="delivery.c" />
-    <ClCompile Include="email.c" />
+    <ClCompile Include="email_address.c" />
     <ClCompile Include="mail.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="message.c" />
     <ClCompile Include="format.c" />
     <ClCompile Include="server.c" />
+    <ClCompile Include="smtp_request.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="codes.h" />
     <ClInclude Include="delivery.h" />
-    <ClInclude Include="email.h" />
+    <ClInclude Include="email_address.h" />
     <ClInclude Include="header.h" />
     <ClInclude Include="mail.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="format.h" />
     <ClInclude Include="server.h" />
+    <ClInclude Include="smtp_request.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
