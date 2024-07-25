@@ -10,8 +10,8 @@ struct mail_header {
 
 struct mail {
 	struct mail_header headers[HEADERS_COUNT];
-	char* text;
 	int headers_count;
+	char* text;
 };
 
 struct mail init_mail();

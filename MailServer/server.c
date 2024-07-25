@@ -69,7 +69,18 @@ static char* get_smtp_data(SOCKET sock, char* buffer) {
 }
 
 static int serve_quit(SOCKET sock, char* buffer) {
-	send_response(sock, buffer, SERVICE_CLOSING_TRANSMISSION);
+	int status = 0;
+	int message_length = strlen(buffer) - 1;
+
+	if (message_length != strlen("QUIT")) {
+		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
+		if (status == -1) return -1;
+		return 0;
+	}
+
+	status = send_response(sock, buffer, SERVICE_CLOSING_TRANSMISSION);
+	if (status == -1) return -1;
+	return 1;
 }
 
 static int serve_helo(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
@@ -226,6 +237,23 @@ static int serve_data(SOCKET sock, char* buffer, struct smtp_request* smtp_reque
 	return 1;
 }
 
+static int serve_rset(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
+	int status = 0;
+	int message_length = strlen(buffer) - 1;
+
+	if (message_length != strlen("RSET")) {
+		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
+		if (status == -1) return -1;
+		return 0;
+	}
+
+	clean_smtp_request(smtp_request);
+
+	status = send_response(sock, buffer, ACTION_OK);
+	if (status == -1) return -1;
+	return 1;
+}
+
 void serve_connection(SOCKET sock) {
 
 	int status = 0;
@@ -246,7 +274,7 @@ void serve_connection(SOCKET sock) {
 
 		int message_length = strlen(buffer) - 1;
 
-		if (message_has_command("QUIT ", buffer)) {
+		if (message_has_command("QUIT", buffer)) {
 			serve_quit(sock, buffer);
 			break;
 		}
@@ -256,6 +284,7 @@ void serve_connection(SOCKET sock) {
 			if (status == -1) break;
 			continue;
 		}
+
 
 		if (message_has_command("MAIL FROM: ", buffer)) {
 			status = serve_mail_from(sock, buffer, &smtp_request);
@@ -273,6 +302,13 @@ void serve_connection(SOCKET sock) {
 
 		if (message_has_command("DATA", buffer)) {
 			status = serve_data(sock, buffer, &smtp_request, current_state);
+			if (status == -1) break;
+			if (status == 1) current_state = DEFAULT;
+			continue;
+		}
+
+		if (message_has_command("RSET", buffer)) {
+			status = serve_rset(sock, buffer, &smtp_request);
 			if (status == -1) break;
 			if (status == 1) current_state = DEFAULT;
 			continue;

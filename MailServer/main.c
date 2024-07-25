@@ -20,7 +20,7 @@ int main(int argv, char* argc[]) {
     smtp_request.rcpt_to_arr[0] = string_to_email_address("john@domain");
     smtp_request.rcpt_count = 1;
     deliver_mail(smtp_request);
-    return 0;
+    //return 0;
 
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
