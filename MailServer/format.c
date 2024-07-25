@@ -4,15 +4,15 @@
 #include <time.h>
 #include "mail.h"
 #include "smtp_request.h"
-#include "message.h"
+#include "buffer.h"
 #include "config.h"
 
 static int parse_single_header(struct mail* mail, char* header_line) {
 
 	char* separator = strchr(header_line, ':');
 
-	char* new_name = get_field_from_message(header_line, (separator - header_line));
-	char* new_value = get_value_from_message(header_line, (separator - header_line) + 1);
+	char* new_name = get_field_from_buffer(header_line, (separator - header_line));
+	char* new_value = get_value_from_buffer(header_line, (separator - header_line) + 1);
 
 	mail_add_header(mail, new_name, new_value);
 }
@@ -66,9 +66,16 @@ static int mail_get_text(struct mail* mail, char* mail_text) {
 	return 1;
 }
 
-static int mail_get_timestamp(struct mail* mail, char* domain) {
-	struct config config = config_parse_file("config.txt");
+static char* get_time_string() {
+	time_t current_time = time(NULL);
+	char* time_string = ctime(&current_time);
 
+	*(time_string + strlen(time_string) - 1) = 0;
+
+	return time_string;
+}
+
+static char* get_user_domain(char* domain) {
 	char* user_domain;
 
 	if (domain == NULL) {
@@ -81,24 +88,24 @@ static int mail_get_timestamp(struct mail* mail, char* domain) {
 		memcpy(user_domain, domain, strlen(domain));
 	}
 
+	return user_domain;
+}
+
+static int mail_get_timestamp(struct mail* mail, char* domain) {
+	struct config config = config_parse_file("config.txt");
+
+	char* user_domain = get_user_domain(domain);
 	char* server_domain = config_get_domain(&config);
+	char* server_hostname = config_get_hostname(&config);
 
-	time_t current_time = time(NULL);
-	char* time_string = ctime(&current_time);
-
-	*(time_string + strlen(time_string) - 1) = 0;
-
+	char* time_string = get_time_string();
 	char* timestamp = calloc(TIMESTAMP_SIZE, sizeof(char));
 
-	add_to_message(timestamp, "Recieved: from ");
-	add_to_message(timestamp, user_domain);
-	add_to_message(timestamp, " by SMTP server at ");
-	add_to_message(timestamp, server_domain);
-	add_to_message(timestamp, "; ");
-	add_to_message(timestamp, time_string);
-	add_to_message(timestamp, "\n");
+	flush_to_buffer(timestamp, TIMESTAMP_SIZE, "Recieved: from %s by %s.%s; %s\n", user_domain, server_hostname, server_domain, time_string);
 
 	mail_set_timestamp(mail, timestamp);
+
+	free(timestamp);
 	return 1;
 }
 

@@ -1,26 +1,35 @@
+#include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 #include <malloc.h>
+#include <stdarg.h>
 #include <ctype.h>
 
-void add_to_message(char* buffer, char* message) {
+void add_to_buffer(char* buffer, char* message) {
 	memcpy(buffer + strlen(buffer), message, strlen(message) + 1);
 }
 
-char* get_field_from_message(char* message, int offset) {
+void flush_to_buffer(char* buffer, int size, char* format, ...) {
+	va_list va;
+	va_start(va, format);
+	vsnprintf(buffer + strlen(buffer), size, format, va);
+	va_end(va);
+}
+
+char* get_field_from_buffer(char* message, int offset) {
 	char* result = calloc(offset + 1, sizeof(char));
 	memcpy(result, message, offset);
 	return result;
 }
 
-char* get_value_from_message(char* message, int offset) {
+char* get_value_from_buffer(char* message, int offset) {
 	int new_length = strlen(message) - offset - 1;
 	char* result = calloc(new_length + 1, sizeof(char));
 	memcpy(result, message + offset + 1, new_length - 1);
 	return result;
 }
 
-int message_has_command(char* command, char* message) {
+int buffer_has_command(char* command, char* message) {
 	return !memcmp(message, command, strlen(command));
 }
 

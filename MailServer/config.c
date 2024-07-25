@@ -6,6 +6,8 @@
 struct config config_parse_file(char* filename) {
 	struct config new_config;
 	new_config.domain = "domain.local";
+	new_config.hostname = "smtp";
+	new_config.mail_path = ".";
 	new_config.listen_port = 1025;
 	new_config.users = calloc(MAX_USERS, sizeof(char*));
 
@@ -17,6 +19,14 @@ struct config config_parse_file(char* filename) {
 
 char* config_get_domain(struct config* config) {
 	return config->domain;
+}
+
+char* config_get_hostname(struct config* config) {
+	return config->hostname;
+}
+
+char* config_get_mail_path(struct config* config) {
+	return config->mail_path;
 }
 
 char** config_get_users(struct config* config) {

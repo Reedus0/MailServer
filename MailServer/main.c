@@ -16,16 +16,21 @@ int main(int argv, char* argc[]) {
 
     struct config config = config_parse_file("config.txt");
 
-    struct smtp_request smtp_request = init_smtp_request();
-    smtp_request.data = "Subject: Mail subject\nDate: now\n\nMail text\n";
-    //mail.data = "Mail text\n";
-    smtp_request.mail_from = string_to_email_address("john@domain.local");
-    smtp_request.rcpt_to_arr[0] = string_to_email_address("john@domain.local");
-    smtp_request.rcpt_count = 1;
-    deliver_mail(smtp_request);
-    return 0;
+    //struct smtp_request smtp_request = init_smtp_request();
+    //smtp_request.data = "Subject: Mail subject\nDate: now\n\nMail text\n";
+    //smtp_request.data = "Mail text\n";
+    //smtp_request.mail_from = string_to_email_address("john@domain.local");
+    //smtp_request.rcpt_to_arr[0] = string_to_email_address("john@domain.local");
+    //smtp_request.rcpt_count = 1;
+    //deliver_mail(smtp_request);
+    //clean_smtp_request(&smtp_request);
+    //return 0;
 
-    WSAStartup(MAKEWORD(2, 2), &wsa_data);
+    int status = WSAStartup(MAKEWORD(2, 2), &wsa_data);
+    if (status != 0) {
+        return 1;
+    }
+
     int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     struct sockaddr_in server_address;

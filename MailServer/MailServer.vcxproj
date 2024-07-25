@@ -133,7 +133,7 @@
     <ClCompile Include="email_address.c" />
     <ClCompile Include="mail.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="message.c" />
+    <ClCompile Include="buffer.c" />
     <ClCompile Include="format.c" />
     <ClCompile Include="server.c" />
     <ClCompile Include="smtp_request.c" />
@@ -145,7 +145,7 @@
     <ClInclude Include="email_address.h" />
     <ClInclude Include="header.h" />
     <ClInclude Include="mail.h" />
-    <ClInclude Include="message.h" />
+    <ClInclude Include="buffer.h" />
     <ClInclude Include="format.h" />
     <ClInclude Include="server.h" />
     <ClInclude Include="smtp_request.h" />

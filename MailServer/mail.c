@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include "mail.h"
+#include "buffer.h"
 
 struct mail init_mail() {
 	struct mail new_mail;
@@ -49,18 +50,16 @@ int mail_set_timestamp(struct mail* mail, char* timestamp) {
 
 char* build_mail(struct mail* mail) {
 	char* result = calloc(MAIL_SIZE, sizeof(char));
-	add_to_message(result, mail->timestamp);
+	add_to_buffer(result, mail->timestamp);
 	for (int i = 0; i < mail->headers_count; i++) {
 		struct mail_header current_header = mail->headers[i];
-		add_to_message(result, current_header.name);
-		add_to_message(result, ": ");
-		add_to_message(result, current_header.value);
-		add_to_message(result, "\n");
+		int name_length = strlen(current_header.name);
+		int value_length = strlen(current_header.value) + 1;
+		flush_to_buffer(result, name_length + value_length + 3, "%s: %s\n", current_header.name, current_header.value);
 	}
 
-	add_to_message(result, "\n");
-	add_to_message(result, mail->text);
-	add_to_message(result, "\n");
+	int text_length = strlen(mail->text) + 1;
+	flush_to_buffer(result, text_length + 2, "\n%s\n", mail->text);
 
 	return result;
 }

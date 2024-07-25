@@ -24,7 +24,7 @@
     <ClCompile Include="server.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="message.c">
+    <ClCompile Include="buffer.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="delivery.c">
@@ -56,7 +56,7 @@
     <ClInclude Include="server.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="message.h">
+    <ClInclude Include="buffer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="delivery.h">
