@@ -30,20 +30,20 @@ static int write_mail_to_file(char* recipient, char* buffer) {
 }
 
 void deliver_mail(struct smtp_request* smtp_request) {
-	struct mail mail = init_mail();
+	struct mail* mail = init_mail();
 
-	format_mail(&mail, smtp_request);
+	format_mail(mail, smtp_request);
 	
 	for (int i = 0; i < smtp_request->rcpt_count; i++) {
 		struct email_address* recipient = smtp_request->rcpt_to_arr[i];
 
 		if (recipient->user != NULL && recipient->domain != NULL) {
-			char* final_text = build_mail(&mail);
+			char* final_text = build_mail(mail);
 			write_mail_to_file(recipient->user, final_text);
 			free(final_text);
 		}
 
 	}
 
-	clean_mail(&mail);
+	clean_mail(mail);
 }
