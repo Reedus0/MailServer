@@ -8,10 +8,8 @@ struct config config_parse_file(char* filename) {
 	new_config.domain = "domain.local";
 	new_config.mail_path = ".";
 	new_config.listen_port = 1025;
-	new_config.users = calloc(MAX_USERS, sizeof(char*));
-
-	new_config.users[0] = "john";
-	new_config.users[1] = "carl";
+	char* users[2] = {"john", "carl"};
+	new_config.users = users;
 
 	return new_config;
 }

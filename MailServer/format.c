@@ -76,8 +76,6 @@ static char* get_time_string() {
 }
 
 static int mail_get_timestamp(struct mail* mail, struct email_address* mail_from) {
-	struct config config = config_parse_file("config.txt");
-
 	char* mail_from_string = email_address_to_string(mail_from);
 
 	char* time_string = get_time_string();

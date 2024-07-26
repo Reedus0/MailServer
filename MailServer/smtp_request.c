@@ -5,14 +5,13 @@
 
 struct smtp_request* init_smtp_request() {
 	struct smtp_request* new_smtp_request = calloc(1, sizeof(struct smtp_request));
-	new_smtp_request->mail_from = init_email_address();
+	new_smtp_request->mail_from = NULL;
 	new_smtp_request->domain = NULL;
 	new_smtp_request->data = NULL;
 	new_smtp_request->rcpt_count = 0;
 
 	for (int i = 0; i < RECIPIENT_COUNT; i++) {
-		struct email_address* current_recipient = new_smtp_request->rcpt_to_arr[i];
-		init_email_address(current_recipient);
+		new_smtp_request->rcpt_to_arr[i] = NULL;
 	}
 
 	return new_smtp_request;

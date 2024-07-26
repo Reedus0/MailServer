@@ -16,6 +16,7 @@
 int main(int argv, char* argc[]) {
 
 #if DEBUG_DELIVERY == 1
+START:
     struct smtp_request* smtp_request = init_smtp_request();
 
     char* _data = "Subject: Mail subject\nDate: now\n\nMail text\n";
@@ -26,17 +27,20 @@ int main(int argv, char* argc[]) {
     char* _mail_from = "john@domain.local";
     char* mail_from = calloc(strlen(_mail_from) + 1, sizeof(char));
     memcpy(mail_from, _mail_from, strlen(_mail_from));
-    smtp_request->mail_from = string_to_email_address(_mail_from);
+    smtp_request_set_mail_from(smtp_request, string_to_email_address(_mail_from));
 
     char* _rcpt_to = "john@domain.local";
     char* rcpt_to = calloc(strlen(_rcpt_to) + 1, sizeof(char));
     memcpy(rcpt_to, _rcpt_to, strlen(_rcpt_to));
-    smtp_request->rcpt_to_arr[0] = string_to_email_address(rcpt_to);
-    smtp_request->rcpt_count = 1;
+    smtp_request_add_recipient(smtp_request, string_to_email_address(rcpt_to));
 
     deliver_mail(smtp_request);
     clean_smtp_request(smtp_request);
 
+    free(mail_from);
+    free(rcpt_to);
+
+    goto START;
     return 0;
 #endif
 

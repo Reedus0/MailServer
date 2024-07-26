@@ -26,7 +26,7 @@ struct mail* init_mail() {
 	new_mail->headers_count = 0;
 	
 	for (int i = 0; i < HEADERS_COUNT; i++) {
-		new_mail->headers[i] = init_mail_header();
+		new_mail->headers[i] = NULL;
 	}
 
 	return new_mail;
@@ -35,10 +35,14 @@ struct mail* init_mail() {
 int mail_add_header(struct mail* mail, char* name, char* value) {
 	if (mail->headers_count >= HEADERS_COUNT) return 0;
 
-	mail->headers[mail->headers_count]->name = name;
-	mail->headers[mail->headers_count]->value = value;
+	struct mail_header* new_mail_header = init_mail_header();
 
+	new_mail_header->name = name;
+	new_mail_header->value = value;
+
+	mail->headers[mail->headers_count] = new_mail_header;
 	mail->headers_count += 1;
+
 	return 1;
 }
 

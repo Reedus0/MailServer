@@ -140,6 +140,7 @@ static int serve_mail_from(SOCKET sock, char* buffer, struct smtp_request* smtp_
 	}
 
 	struct email_address* mail_from_email_address = string_to_email_address(mail_from);
+	free(mail_from);
 	smtp_request_set_mail_from(smtp_request, mail_from_email_address);
 
 	status = send_response(sock, buffer, ACTION_OK);
@@ -180,6 +181,7 @@ static int serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_re
 	}
 
 	struct email_address* rcpt_to_email_address = string_to_email_address(rcpt_to);
+	free(rcpt_to);
 
 	struct config config = config_parse_file("config.txt");
 
