@@ -55,12 +55,17 @@ static int check_user(char* user, char** server_users) {
 	return 0;
 }
 
+static int end_of_message(char* buffer) {
+	return !memcmp(buffer, ".\n", 2) && strlen(buffer) == 2;
+}
+
 static char* get_smtp_data(SOCKET sock, char* buffer) {
 	char* message = calloc(SMTP_REQUEST_MAIL_SIZE, sizeof(char));
 	while (1) {
 		int status = get_message(sock, buffer);
 		if (status == -1) break;
-		if (!memcmp(buffer, ".\n", 2)) break;
+
+		if (end_of_message(buffer)) break;
 
 		add_to_buffer(message, buffer);
 	}
@@ -69,7 +74,7 @@ static char* get_smtp_data(SOCKET sock, char* buffer) {
 
 static int serve_quit(SOCKET sock, char* buffer) {
 	int status = 0;
-	int message_length = strlen(buffer) - 1;
+	int message_length = strlen(buffer);
 
 	if (message_length != strlen("QUIT")) {
 		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
@@ -92,7 +97,7 @@ static int serve_helo(SOCKET sock, char* buffer, struct smtp_request* smtp_reque
 		return 0;
 	}
 
-	char* domain = get_value_from_buffer(buffer, strlen("HELO"));
+	char* domain = get_value_from_buffer(buffer, " ");
 	domain = trim_string(domain);
 
 	if (is_empty_string(domain)) {
@@ -119,7 +124,7 @@ static int serve_mail_from(SOCKET sock, char* buffer, struct smtp_request* smtp_
 		return 0;
 	}
 
-	char* mail_from = get_value_from_buffer(buffer, strlen("MAIL FROM:"));
+	char* mail_from = get_value_from_buffer(buffer, ": ");
 	mail_from = trim_string(mail_from);
 
 	if (is_empty_string(mail_from)) {
@@ -159,7 +164,7 @@ static int serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_re
 		return 0;
 	}
 
-	char* rcpt_to = get_value_from_buffer(buffer, strlen("RCPT TO:"));
+	char* rcpt_to = get_value_from_buffer(buffer, ": ");
 	rcpt_to = trim_string(rcpt_to);
 
 	if (is_empty_string(rcpt_to)) {

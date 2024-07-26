@@ -19,7 +19,6 @@ static int clean_mail_header(struct mail_header* mail_header) {
 	return 1;
 }
 
-
 struct mail* init_mail() {
 	struct mail* new_mail = calloc(1, sizeof(struct mail));
 	new_mail->text = NULL;

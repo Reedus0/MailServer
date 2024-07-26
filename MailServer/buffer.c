@@ -22,25 +22,10 @@ char* copy_buffer(char* buffer) {
 	return result;
 }
 
-char* get_field_from_buffer(char* message, int offset) {
-	char* result = calloc(offset + 1, sizeof(char));
-	memcpy(result, message, offset);
-	return result;
-}
-
-char* get_value_from_buffer(char* message, int offset) {
-	int new_length = strlen(message) - offset - 1;
-	char* result = calloc(new_length + 1, sizeof(char));
-	memcpy(result, message + offset + 1, new_length - 1);
-	return result;
-}
-
-int buffer_has_command(char* command, char* message) {
-	return !memcmp(message, command, strlen(command));
-}
-
 static char* ltrim(char* string) {
-	while (isspace(*string)) string++;
+	char* char_pointer = string;
+	while (isspace(*char_pointer)) char_pointer++;
+	memcpy(string, char_pointer, strlen(char_pointer) + 1);
 	return string;
 }
 
@@ -57,6 +42,26 @@ char* trim_string(char* string) {
 		return left_trim;
 	}
 	return rtrim(left_trim);
+}
+
+char* get_field_from_buffer(char* message, char* separator) {
+	char* separator_pointer = strstr(message, separator);
+	int new_length = separator_pointer - message;
+	char* result = calloc(new_length + 1, sizeof(char));
+	memcpy(result, message, new_length);
+	return result;
+}
+
+char* get_value_from_buffer(char* message, char* separator) {
+	char* separator_pointer = strstr(message, separator) + strlen(separator);
+	int new_length = strlen(separator_pointer);
+	char* result = calloc(new_length + 1, sizeof(char));
+	memcpy(result, separator_pointer, new_length);
+	return result;
+}
+
+int buffer_has_command(char* command, char* message) {
+	return !memcmp(message, command, strlen(command));
 }
 
 int is_empty_string(char* string) {
