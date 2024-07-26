@@ -29,6 +29,10 @@ static char* get_header_line(char* mait_text) {
 		return NULL;
 	}
 
+	if (separator > end_of_line) {
+		return NULL;
+	}
+
 	int header_line_length = end_of_line - mait_text + 1;
 
 	char* header_line = calloc(header_line_length, sizeof(char));
