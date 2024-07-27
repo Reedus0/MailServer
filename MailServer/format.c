@@ -33,10 +33,10 @@ static char* get_header_line(char* mait_text) {
 		return NULL;
 	}
 
-	int header_line_length = end_of_line - mait_text + 1;
+	int header_line_length = end_of_line - mait_text;
 
-	char* header_line = calloc(header_line_length, sizeof(char));
-	memcpy(header_line, mait_text, header_line_length - 1);
+	char* header_line = calloc(header_line_length + 1, sizeof(char));
+	memcpy(header_line, mait_text, header_line_length);
 
 	return header_line;
 }
@@ -45,7 +45,7 @@ static int mail_parse_headers(struct mail* mail, char* mail_text) {
 	char* char_pointer = strstr(mail_text, "\r\n");
 	char* end_of_headers = strstr(mail_text, "\r\n\r\n");
 	char* base_line = mail_text;
-	while (base_line != end_of_headers + 2) {
+	while (base_line != end_of_headers + strlen("\r\n")) {
 		char* current_line = get_header_line(base_line);
 
 		if (current_line == NULL || *current_line == NULL) {
@@ -60,11 +60,11 @@ static int mail_parse_headers(struct mail* mail, char* mail_text) {
 		
 		free(current_line);
 
-		base_line = char_pointer + 2;
+		base_line = char_pointer + strlen("\r\n");
 		char_pointer = strstr(base_line, "\r\n");
 	}
 
-	char* new_text = copy_buffer(end_of_headers + 4);
+	char* new_text = copy_buffer(end_of_headers + strlen("\r\n\r\n"));
 	mail_set_text(mail, new_text);
 
 	return 1;

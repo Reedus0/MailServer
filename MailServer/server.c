@@ -39,54 +39,8 @@ static int send_response(SOCKET sock, char* response, char* code) {
 	return send_message(sock, response);
 }
 
-static int check_domain(char* domain, char* server_domain) {
-	return !memcmp(domain, server_domain, strlen(server_domain));
-}
-
-static int check_user(char* user, char* server_user) {
-	if (strlen(server_user) != strlen(user)) {
-		return 0;
-	}
-	if (!memcmp(user, server_user, strlen(server_user))) {
-		return 1;
-	}
-	return 0;
-}
-
 static int get_message_length(char* buffer) {
 	return strlen(buffer) - 2;
-}
-
-static int delete_dot(char* buffer) {
-	char* dot_pointer = strstr(buffer, "\r\n.\r\n", 5);
-	if (dot_pointer != NULL) {
-		*(dot_pointer + 2) = 0;
-		return 1;
-	}
-	return 0;
-}
-
-static int end_of_message(char* buffer) {
-	return strstr(buffer, "\r\n.\r\n", 5) != NULL;
-}
-
-static int get_smtp_line(char* message, char* buffer) {
-	int minimum = MIN(strlen(buffer), BUFFER_SIZE);
-	memcpy(message + strlen(message), buffer, minimum);
-}
-
-static char* get_smtp_data(SOCKET sock, char* buffer) {
-	char* message = calloc(SMTP_REQUEST_MAIL_SIZE, sizeof(char));
-	while (1) {
-		int status = get_message(sock, buffer);
-		if (status == -1) break;
-
-		get_smtp_line(message, buffer);
-
-		if (end_of_message(message)) break;
-	}
-	delete_dot(message);
-	return message;
 }
 
 static int serve_quit(SOCKET sock, char* buffer) {
@@ -166,6 +120,20 @@ static int serve_mail_from(SOCKET sock, char* buffer, struct smtp_request* smtp_
 	return 1;
 }
 
+static int check_domain(char* domain, char* server_domain) {
+	return !memcmp(domain, server_domain, strlen(server_domain));
+}
+
+static int check_user(char* user, char* server_user) {
+	if (strlen(server_user) != strlen(user)) {
+		return 0;
+	}
+	if (!memcmp(user, server_user, strlen(server_user))) {
+		return 1;
+	}
+	return 0;
+}
+
 static int serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_request, enum server_states current_state) {
 	int status = 0;
 	int message_length = get_message_length(buffer);
@@ -229,6 +197,38 @@ static int serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_re
 	if (status == -1) return -1;
 
 	return 1;
+}
+
+static int delete_dot(char* buffer) {
+	char* dot_pointer = strstr(buffer, "\r\n.\r\n", 5);
+	if (dot_pointer != NULL) {
+		*(dot_pointer + 2) = 0;
+		return 1;
+	}
+	return 0;
+}
+
+static int end_of_message(char* buffer) {
+	return strstr(buffer, "\r\n.\r\n", 5) != NULL;
+}
+
+static int get_smtp_line(char* message, char* buffer) {
+	int minimum = MIN(strlen(buffer), BUFFER_SIZE);
+	memcpy(message + strlen(message), buffer, minimum);
+}
+
+static char* get_smtp_data(SOCKET sock, char* buffer) {
+	char* message = calloc(SMTP_REQUEST_MAIL_SIZE, sizeof(char));
+	while (1) {
+		int status = get_message(sock, buffer);
+		if (status == -1) break;
+
+		get_smtp_line(message, buffer);
+
+		if (end_of_message(message)) break;
+	}
+	delete_dot(message);
+	return message;
 }
 
 static int serve_data(SOCKET sock, char* buffer, struct smtp_request* smtp_request, enum server_states current_state) {

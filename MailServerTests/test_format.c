@@ -1,11 +1,11 @@
-#include "stdio.h"
+#include <stdio.h>
 #include "smtp_request.h"
 #include "mail.h"
 #include "func.h"
 #include "make.h"
 #include "format.h"
 
-static int test_header_count() {
+int test_header_count() {
     struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", "Subject: Mail subject\r\nDate: now\r\n\r\nMail text\r\n");
     struct mail* mail = init_mail();
 
@@ -18,7 +18,7 @@ static int test_header_count() {
     return 0;
 }
 
-static int test_space_headers() {
+int test_space_headers() {
     struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", " Subject: Mail\r\n\r\nMail text\r\n");
     struct mail* mail = init_mail();
 
@@ -31,7 +31,7 @@ static int test_space_headers() {
     return 0;
 }
 
-static int test_no_headers() {
+int test_no_headers() {
     struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", "Mail text\r\n");
     struct mail* mail = init_mail();
 
@@ -44,7 +44,7 @@ static int test_no_headers() {
     return 0;
 }
 
-static int test_pre_enter() {
+int test_pre_enter() {
     struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", "\r\nSubject: Mail subject\r\nMail text\r\n");
     struct mail* mail = init_mail();
 
@@ -57,7 +57,7 @@ static int test_pre_enter() {
     return 0;
 }
 
-static int test_no_double_enter() {
+int test_no_double_enter() {
     struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", "Subject: Mail subject\r\nMail text\r\nData: now\r\n\r\nMail text\r\n");
     struct mail* mail = init_mail();
 
@@ -70,7 +70,7 @@ static int test_no_double_enter() {
     return 0;
 }
 
-static int test_emptry_message_two_enter() {
+int test_emptry_message_two_enter() {
     struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", "Subject: Mail subject\r\nDate: now\r\n\r\n");
     struct mail* mail = init_mail();
 
@@ -83,7 +83,7 @@ static int test_emptry_message_two_enter() {
     return 0;
 }
 
-static int test_emptry_message_one_enter() {
+int test_emptry_message_one_enter() {
     struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", "Subject: Mail subject\r\nDate: now\r\n");
     struct mail* mail = init_mail();
 
@@ -96,7 +96,7 @@ static int test_emptry_message_one_enter() {
     return 0;
 }
 
-static int test_normal() {
+int test_normal() {
     struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", "Subject: Mail subject\r\nDate: now\r\n\r\nMail text\r\n");
     struct mail* mail = init_mail();
 
@@ -107,17 +107,4 @@ static int test_normal() {
         return 1;
     }
     return 0;
-}
-
-int test_format() {
-    printf("Start test_format\n");
-    test_normal();
-    test_emptry_message_one_enter();
-    test_emptry_message_two_enter();
-    test_no_double_enter();
-    test_pre_enter();
-    test_no_headers();
-    test_space_headers();
-
-    test_header_count();
 }

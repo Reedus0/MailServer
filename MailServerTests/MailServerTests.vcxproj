@@ -133,6 +133,7 @@
     <ClCompile Include="func.c" />
     <ClCompile Include="make.c" />
     <ClCompile Include="test.c" />
+    <ClCompile Include="test_email_address.c" />
     <ClCompile Include="test_format.c" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +145,7 @@
     <ClInclude Include="func.h" />
     <ClInclude Include="header.h" />
     <ClInclude Include="make.h" />
+    <ClInclude Include="test_email_address.h" />
     <ClInclude Include="test_format.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
