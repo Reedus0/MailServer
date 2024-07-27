@@ -61,7 +61,7 @@ char* get_value_from_buffer(char* message, char* separator) {
 }
 
 int buffer_has_command(char* command, char* message) {
-	return !memcmp(message, command, strlen(command));
+	return strstr(message, command, strlen(command)) != NULL;
 }
 
 int is_empty_string(char* string) {

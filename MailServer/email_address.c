@@ -25,6 +25,11 @@ struct email_address* string_to_email_address(char* string) {
 	struct email_address* email_address = calloc(1, sizeof(struct email_address));
 	char* separator = strchr(string, '@');
 
+	if (*string == '<') {
+		*(string + strlen(string) - 1) = 0;
+		string += 1;
+	}
+
 	int user_length = separator - string;
 	char* user = calloc(user_length + 1, sizeof(char));
 	memcpy(user, string, user_length);

@@ -1,6 +1,7 @@
 #include <string.h>
 
 #define MAX(a,b) (a > b ? a : b)
+#define MIN(a,b) (a > b ? b : a)
 
 int string_except_eq(char* first, char* second) {
 	return !memcmp(first, second, MAX(strlen(first), strlen(second)));

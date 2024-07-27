@@ -8,8 +8,7 @@ struct config config_parse_file(char* filename) {
 	new_config.domain = "domain.local";
 	new_config.mail_path = ".";
 	new_config.listen_port = 1025;
-	char* users[2] = {"john", "carl"};
-	new_config.users = users;
+	new_config.users = "john";
 
 	return new_config;
 }
@@ -22,7 +21,7 @@ char* config_get_mail_path(struct config* config) {
 	return config->mail_path;
 }
 
-char** config_get_users(struct config* config) {
+char* config_get_users(struct config* config) {
 	return config->users;
 }
 

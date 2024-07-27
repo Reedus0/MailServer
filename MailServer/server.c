@@ -3,6 +3,7 @@
 #include <Winsock2.h>
 #include <malloc.h>
 #include <string.h>
+#include "header.h"
 #include "buffer.h"
 #include "codes.h"
 #include "smtp_request.h"
@@ -42,21 +43,36 @@ static int check_domain(char* domain, char* server_domain) {
 	return !memcmp(domain, server_domain, strlen(server_domain));
 }
 
-static int check_user(char* user, char** server_users) {
-	for (int i = 0; i < 2; i++) {
-		char* current_user = server_users[i];
-		if (strlen(current_user) != strlen(user)) {
-			continue;
-		}
-		if (!memcmp(user, current_user, strlen(current_user))) {
-			return 1;
-		}
+static int check_user(char* user, char* server_user) {
+	if (strlen(server_user) != strlen(user)) {
+		return 0;
+	}
+	if (!memcmp(user, server_user, strlen(server_user))) {
+		return 1;
+	}
+	return 0;
+}
+
+static int get_message_length(char* buffer) {
+	return strlen(buffer) - 2;
+}
+
+static int delete_dot(char* buffer) {
+	char* dot_pointer = strstr(buffer, "\r\n.\r\n", 5);
+	if (dot_pointer != NULL) {
+		*(dot_pointer + 2) = 0;
+		return 1;
 	}
 	return 0;
 }
 
 static int end_of_message(char* buffer) {
-	return !memcmp(buffer, ".\n", 2) && strlen(buffer) == 2;
+	return strstr(buffer, "\r\n.\r\n", 5) != NULL;
+}
+
+static int get_smtp_line(char* message, char* buffer) {
+	int minimum = MIN(strlen(buffer), BUFFER_SIZE);
+	memcpy(message + strlen(message), buffer, minimum);
 }
 
 static char* get_smtp_data(SOCKET sock, char* buffer) {
@@ -65,16 +81,17 @@ static char* get_smtp_data(SOCKET sock, char* buffer) {
 		int status = get_message(sock, buffer);
 		if (status == -1) break;
 
-		if (end_of_message(buffer)) break;
+		get_smtp_line(message, buffer);
 
-		add_to_buffer(message, buffer);
+		if (end_of_message(message)) break;
 	}
+	delete_dot(message);
 	return message;
 }
 
 static int serve_quit(SOCKET sock, char* buffer) {
 	int status = 0;
-	int message_length = strlen(buffer);
+	int message_length = get_message_length(buffer);
 
 	if (message_length != strlen("QUIT")) {
 		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
@@ -89,7 +106,7 @@ static int serve_quit(SOCKET sock, char* buffer) {
 
 static int serve_helo(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
 	int status = 0;
-	int message_length = strlen(buffer) - 1;
+	int message_length = get_message_length(buffer);
 
 	if (message_length == strlen("HELO ")) {
 		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
@@ -116,7 +133,7 @@ static int serve_helo(SOCKET sock, char* buffer, struct smtp_request* smtp_reque
 
 static int serve_mail_from(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
 	int status = 0;
-	int message_length = strlen(buffer) - 1;
+	int message_length = get_message_length(buffer);
 
 	if (message_length == strlen("MAIL FROM: ")) {
 		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
@@ -124,7 +141,7 @@ static int serve_mail_from(SOCKET sock, char* buffer, struct smtp_request* smtp_
 		return 0;
 	}
 
-	char* mail_from = get_value_from_buffer(buffer, ": ");
+	char* mail_from = get_value_from_buffer(buffer, ":");
 	mail_from = trim_string(mail_from);
 
 	if (is_empty_string(mail_from)) {
@@ -151,7 +168,7 @@ static int serve_mail_from(SOCKET sock, char* buffer, struct smtp_request* smtp_
 
 static int serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_request, enum server_states current_state) {
 	int status = 0;
-	int message_length = strlen(buffer) - 1;
+	int message_length = get_message_length(buffer);
 
 	if (!(current_state & HAS_FROM)) {
 		status = send_response(sock, buffer, BAD_SEQUENCE);
@@ -165,7 +182,7 @@ static int serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_re
 		return 0;
 	}
 
-	char* rcpt_to = get_value_from_buffer(buffer, ": ");
+	char* rcpt_to = get_value_from_buffer(buffer, ":");
 	rcpt_to = trim_string(rcpt_to);
 
 	if (is_empty_string(rcpt_to)) {
@@ -186,7 +203,7 @@ static int serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_re
 	struct config config = config_parse_file("config.txt");
 
 	char* server_domain = config_get_domain(&config);
-	char** server_users = config_get_users(&config);
+	char* server_user = config_get_users(&config);
 
 	if (!check_domain(rcpt_to_email_address->domain, server_domain)) {
 		status = send_response(sock, buffer, USER_NOT_LOCAL);
@@ -194,7 +211,7 @@ static int serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_re
 		return 0;
 	}
 
-	if (!check_user(rcpt_to_email_address->user, server_users)) {
+	if (!check_user(rcpt_to_email_address->user, server_user)) {
 		status = send_response(sock, buffer, USER_NOT_LOCAL);
 		if (status == -1) return -1;
 		return 0;
@@ -216,7 +233,7 @@ static int serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_re
 
 static int serve_data(SOCKET sock, char* buffer, struct smtp_request* smtp_request, enum server_states current_state) {
 	int status = 0;
-	int message_length = strlen(buffer) - 1;
+	int message_length = get_message_length(buffer);
 
 	if (current_state != (HAS_FROM | HAS_TO)) {
 		status = send_response(sock, buffer, BAD_SEQUENCE);
@@ -248,7 +265,7 @@ static int serve_data(SOCKET sock, char* buffer, struct smtp_request* smtp_reque
 
 static int serve_rset(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
 	int status = 0;
-	int message_length = strlen(buffer) - 1;
+	int message_length = get_message_length(buffer);
 
 	if (message_length != strlen("RSET")) {
 		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
@@ -293,14 +310,14 @@ void serve_connection(SOCKET sock) {
 			continue;
 		}
 
-		if (buffer_has_command("MAIL FROM: ", buffer)) {
+		if (buffer_has_command("MAIL FROM:", buffer)) {
 			status = serve_mail_from(sock, buffer, smtp_request);
 			if (status == -1) break;
 			if (status == 1) current_state |= HAS_FROM;
 			continue;
 		}
 
-		if (buffer_has_command("RCPT TO: ", buffer)) {
+		if (buffer_has_command("RCPT TO:", buffer)) {
 			status = serve_rcpt_to(sock, buffer, smtp_request, current_state);
 			if (status == -1) break;
 			if (status == 1) current_state |= HAS_TO;

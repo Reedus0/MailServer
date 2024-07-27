@@ -7,30 +7,7 @@
 #include "config.h"
 #pragma comment(lib, "ws2_32.lib")
 
-#if DEBUG_DELIVERY == 1
-#include "smtp_request.h"
-#include "delivery.h"
-#include "email_address.h"
-#endif
-
 int main(int argv, char* argc[]) {
-
-#if DEBUG_DELIVERY == 1
-    struct smtp_request* smtp_request = init_smtp_request();
-
-    char* _data = "Subject: Mail subject\nDate: now\n\nMail text\n";
-    char* data = calloc(strlen(_data) + 1, sizeof(char));
-    memcpy(data, _data, strlen(_data));
-    smtp_request_set_data(smtp_request, data);
-
-    smtp_request_set_mail_from(smtp_request, string_to_email_address("john@domain.local"));
-    smtp_request_add_recipient(smtp_request, string_to_email_address("john@domain.local"));
-
-    deliver_mail(smtp_request);
-    clean_smtp_request(smtp_request);
-
-    return 0;
-#endif
 
     thrd_t new_thread;
     WSADATA wsa_data;
