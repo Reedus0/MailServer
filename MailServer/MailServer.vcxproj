@@ -131,6 +131,7 @@
     <ClCompile Include="config.c" />
     <ClCompile Include="delivery.c" />
     <ClCompile Include="email_address.c" />
+    <ClCompile Include="list.c" />
     <ClCompile Include="mail.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="buffer.c" />
@@ -144,6 +145,7 @@
     <ClInclude Include="delivery.h" />
     <ClInclude Include="email_address.h" />
     <ClInclude Include="header.h" />
+    <ClInclude Include="list.h" />
     <ClInclude Include="mail.h" />
     <ClInclude Include="buffer.h" />
     <ClInclude Include="format.h" />

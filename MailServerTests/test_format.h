@@ -9,3 +9,4 @@ int test_no_headers();
 int test_space_headers();
 
 int test_header_count();
+int test_header_no_space();

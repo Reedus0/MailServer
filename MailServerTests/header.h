@@ -7,3 +7,4 @@
 #include "buffer.c"
 #include "config.c"
 #include "format.c"
+#include "list.c"

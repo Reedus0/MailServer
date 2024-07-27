@@ -21,14 +21,19 @@ int validate_email_string(char* string) {
 	return has_username && has_domain && has_email_symbol && one_email_symbol;
 }
 
+static char* remove_email_arrows(char* string) {
+	if (*string == '<') {
+		*(string + strlen(string) - 1) = 0;
+		return string += 1;
+	}
+	return string;
+}
+
 struct email_address* string_to_email_address(char* string) {
 	struct email_address* email_address = calloc(1, sizeof(struct email_address));
 	char* separator = strchr(string, '@');
 
-	if (*string == '<') {
-		*(string + strlen(string) - 1) = 0;
-		string += 1;
-	}
+	string = remove_email_arrows(string);
 
 	int user_length = separator - string;
 	char* user = calloc(user_length + 1, sizeof(char));

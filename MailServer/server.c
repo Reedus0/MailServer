@@ -281,6 +281,21 @@ static int serve_rset(SOCKET sock, char* buffer, struct smtp_request* smtp_reque
 	return 1;
 }
 
+static int serve_noop(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
+	int status = 0;
+	int message_length = get_message_length(buffer);
+
+	if (message_length != strlen("RSET")) {
+		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
+		if (status == -1) return -1;
+		return 0;
+	}
+
+	status = send_response(sock, buffer, ACTION_OK);
+	if (status == -1) return -1;
+	return 1;
+}
+
 void serve_connection(SOCKET sock) {
 
 	int status = 0;
@@ -335,6 +350,12 @@ void serve_connection(SOCKET sock) {
 			status = serve_rset(sock, buffer, smtp_request);
 			if (status == -1) break;
 			if (status == 1) current_state = DEFAULT;
+			continue;
+		}
+
+		if (buffer_has_command("NOOP", buffer)) {
+			status = serve_noop(sock, buffer, smtp_request);
+			if (status == -1) break;
 			continue;
 		}
 

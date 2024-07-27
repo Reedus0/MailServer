@@ -4,19 +4,30 @@
 
 #include "test_format.h"
 #include "test_email_address.h"
+#include "test_list.h"
 
 int test_list(char* list_name, int (*tests[])()) {
     printf("\nStarting %s tests...\n\n", list_name);
     int i = 0;
     int result = 0;
     while (tests[i] != NULL) {
-        result += tests[i]();
+        int test_result = tests[i]();
+        result += test_result;
         i += 1;
     }
     printf("\nTest count: %d, passed: %d\n", i, result);
 }
 
 int main(int argv, char* argc[]) {
+
+    int (*list_tests[])() = {
+        test_list_insert,
+        test_list_remove_last,
+        test_list_remove_center,
+        NULL
+    };
+    test_list("list", list_tests);
+
     int (*email_address_tests[])() = {
         test_make_email_normal,
         test_make_email_arrows,
@@ -35,6 +46,7 @@ int main(int argv, char* argc[]) {
         test_space_headers,
 
         test_header_count,
+        test_header_no_space,
         NULL
     };
     test_list("format", format_tests);

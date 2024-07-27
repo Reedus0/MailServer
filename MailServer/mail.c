@@ -11,14 +11,6 @@ static struct mail_header* init_mail_header() {
 	return new_mail_header;
 }
 
-static int clean_mail_header(struct mail_header* mail_header) {
-	free(mail_header->name);
-	free(mail_header->value);
-
-	free(mail_header);
-	return 1;
-}
-
 struct mail* init_mail() {
 	struct mail* new_mail = calloc(1, sizeof(struct mail));
 	new_mail->text = NULL;
@@ -70,6 +62,14 @@ char* build_mail(struct mail* mail) {
 	flush_to_buffer(result, text_length + 2, "\n%s\n", mail->text);
 
 	return result;
+}
+
+static int clean_mail_header(struct mail_header* mail_header) {
+	free(mail_header->name);
+	free(mail_header->value);
+
+	free(mail_header);
+	return 1;
 }
 
 int clean_mail(struct mail* mail) {

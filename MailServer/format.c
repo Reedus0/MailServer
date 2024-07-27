@@ -9,9 +9,10 @@
 
 static int add_single_header(struct mail* mail, char* header_line) {
 
-	char* new_name = get_field_from_buffer(header_line, ": ");
+	char* new_name = get_field_from_buffer(header_line, ":");
 	new_name = trim_string(new_name);
-	char* new_value = get_value_from_buffer(header_line, ": ");
+	char* new_value = get_value_from_buffer(header_line, ":");
+	new_value = trim_string(new_value);
 
 	return mail_add_header(mail, new_name, new_value);
 }
@@ -94,8 +95,13 @@ static int mail_get_timestamp(struct mail* mail, struct email_address* mail_from
 	return 1;
 }
 
+static int mail_add_server_headers(struct mail* mail) {
+	return 1;
+}
+
 int format_mail(struct mail* mail, struct smtp_request* smtp_request) {
 	mail_get_timestamp(mail, smtp_request->mail_from);
+	mail_add_server_headers(mail);
 	mail_parse_headers(mail, smtp_request->data);
 
 	return 1;

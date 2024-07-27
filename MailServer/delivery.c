@@ -22,7 +22,6 @@ static int write_mail_to_file(char* recipient, char* buffer) {
 	if (file_ptr == NULL) {
 		return -1;
 	}
-
 	fprintf(file_ptr, "%s", buffer);
 	fclose(file_ptr);
 	free(full_path);

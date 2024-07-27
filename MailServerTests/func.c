@@ -18,3 +18,11 @@ int int_except_eq(int first, int second) {
 int int_except_not_eq(int first, int second) {
 	return !int_except_eq(first, second);
 }
+
+int ptr_except_eq(void* first, void* second) {
+	return first == second;
+}
+
+int ptr_except_not_eq(void* first, void* second) {
+	return !ptr_except_eq(first, second);
+}
