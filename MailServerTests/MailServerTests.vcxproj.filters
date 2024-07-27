@@ -36,6 +36,9 @@
     <ClCompile Include="test_list.c">
       <Filter>Исходные файлы\tests</Filter>
     </ClCompile>
+    <ClCompile Include="test_smtp_request.c">
+      <Filter>Исходные файлы\tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header.h">
@@ -54,6 +57,9 @@
       <Filter>Исходные файлы\tests</Filter>
     </ClInclude>
     <ClInclude Include="test_list.h">
+      <Filter>Исходные файлы\tests</Filter>
+    </ClInclude>
+    <ClInclude Include="test_smtp_request.h">
       <Filter>Исходные файлы\tests</Filter>
     </ClInclude>
   </ItemGroup>

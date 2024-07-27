@@ -136,6 +136,7 @@
     <ClCompile Include="test_email_address.c" />
     <ClCompile Include="test_format.c" />
     <ClCompile Include="test_list.c" />
+    <ClCompile Include="test_smtp_request.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MailServer\MailServer.vcxproj">
@@ -146,6 +147,7 @@
     <ClInclude Include="func.h" />
     <ClInclude Include="header.h" />
     <ClInclude Include="make.h" />
+    <ClInclude Include="test_smtp_request.h" />
     <ClInclude Include="test_email_address.h" />
     <ClInclude Include="test_format.h" />
     <ClInclude Include="test_list.h" />

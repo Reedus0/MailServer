@@ -285,7 +285,7 @@ static int serve_noop(SOCKET sock, char* buffer, struct smtp_request* smtp_reque
 	int status = 0;
 	int message_length = get_message_length(buffer);
 
-	if (message_length != strlen("RSET")) {
+	if (message_length != strlen("NOOP")) {
 		status = send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		if (status == -1) return -1;
 		return 0;

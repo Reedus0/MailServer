@@ -34,15 +34,17 @@ void deliver_mail(struct smtp_request* smtp_request) {
 
 	format_mail(mail, smtp_request);
 	
-	for (int i = 0; i < smtp_request->rcpt_count; i++) {
-		struct email_address* recipient = smtp_request->rcpt_to_arr[i];
-
-		if (recipient->user != NULL && recipient->domain != NULL) {
+	struct smtp_request_recipient* last_recipient = smtp_request->rcpt_to_list;
+	while (1) {
+		if (last_recipient->email_address->user != NULL && last_recipient->email_address->domain != NULL) {
 			char* final_text = build_mail(mail);
-			write_mail_to_file(recipient->user, final_text);
+			write_mail_to_file(last_recipient->email_address->user, final_text);
 			free(final_text);
 		}
-
+		if (last_recipient->list.next == NULL) {
+			break;
+		}
+		last_recipient = list_parent(last_recipient->list.next, struct smtp_request_recipient, list);
 	}
 
 	clean_mail(mail);
