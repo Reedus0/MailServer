@@ -5,10 +5,16 @@
 #include "header.h"
 #include "server.h"
 #include "net.h"
+#include "buffer.h"
 
-static enum STATUS delete_dot(char* buffer) {
-	char* dot_pointer = strstr(buffer, "\r\n.\r\n", 5);
-	*(dot_pointer + 2) = 0;
+static enum STATUS delete_dots(char* buffer) {
+	char* dot_pointer = strstr(buffer, "\r\n.", 3);
+	while (dot_pointer != NULL) {
+		*(dot_pointer + strlen("\r\n")) = 0;
+		dot_pointer = dot_pointer + strlen("\r\n") + 1;
+		add_to_buffer(buffer, dot_pointer);
+		dot_pointer = strstr(dot_pointer, "\r\n.", 3);
+	}
 	return STATUS_OK;
 }
 
@@ -32,7 +38,7 @@ static char* get_smtp_data(SOCKET sock, char* buffer) {
 
 		if (smtp_data_ended(message)) break;
 	}
-	delete_dot(message);
+	delete_dots(message);
 	return message;
 }
 
