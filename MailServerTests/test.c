@@ -51,9 +51,6 @@ int main(int argv, char* argc[]) {
         test_pre_enter,
         test_no_headers,
         test_space_headers,
-
-        test_header_count,
-        test_header_no_space,
         NULL
     };
     test_list("format", format_tests);

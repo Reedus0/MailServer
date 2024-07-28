@@ -14,29 +14,29 @@ struct smtp_request* init_smtp_request() {
 	return new_smtp_request;
 }
 
-static struct smtp_request_recipient* init_smtp_requset_recipient() {
-	struct smtp_request_recipient* new_smtp_requset_recipient = calloc(1, sizeof(struct smtp_request_recipient));
+static struct smtp_request_recipient* init_smtp_request_recipient() {
+	struct smtp_request_recipient* new_smtp_request_recipient = calloc(1, sizeof(struct smtp_request_recipient));
 
-	new_smtp_requset_recipient->list = init_list();
-	new_smtp_requset_recipient->email_address = NULL;
+	new_smtp_request_recipient->list = init_list();
+	new_smtp_request_recipient->email_address = NULL;
 
-	return new_smtp_requset_recipient;
+	return new_smtp_request_recipient;
 }
 
 int smtp_request_add_recipient(struct smtp_request* smtp_request, struct email_address* recipient) {
-	struct smtp_request_recipient* new_smtp_requset_recipient = init_smtp_requset_recipient();
+	struct smtp_request_recipient* new_smtp_request_recipient = init_smtp_request_recipient();
 
-	new_smtp_requset_recipient->email_address = recipient;
+	new_smtp_request_recipient->email_address = recipient;
 
 	if (smtp_request->rcpt_to_list == NULL) {
-		smtp_request->rcpt_to_list = new_smtp_requset_recipient;
+		smtp_request->rcpt_to_list = new_smtp_request_recipient;
 		return 1;
 	}
 
 	struct smtp_request_recipient* last_recipient = smtp_request->rcpt_to_list;
-	list_insert(&last_recipient->list, &new_smtp_requset_recipient->list);
+	list_insert(&last_recipient->list, &new_smtp_request_recipient->list);
 
-	smtp_request->rcpt_to_list = new_smtp_requset_recipient;
+	smtp_request->rcpt_to_list = new_smtp_request_recipient;
 	return 1;
 }
 
@@ -53,10 +53,10 @@ int smtp_request_set_data(struct smtp_request* smtp_request, char* data) {
 	return 1;
 }
 
-static int clean_smtp_request_recipient(struct smtp_request_recipient* smtp_requset_recipient) {
-	clean_email_address(smtp_requset_recipient->email_address);
+static int clean_smtp_request_recipient(struct smtp_request_recipient* smtp_request_recipient) {
+	if (smtp_request_recipient->email_address != NULL) clean_email_address(smtp_request_recipient->email_address);
 
-	free(smtp_requset_recipient);
+	free(smtp_request_recipient);
 	return 1;
 }
 

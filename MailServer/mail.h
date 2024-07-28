@@ -1,19 +1,20 @@
 #pragma once
 
-#define HEADERS_COUNT 16
+#include "list.h"
+
 #define MAIL_SIZE 8192
 #define TIMESTAMP_SIZE 128
 
 struct mail_header {
 	char* name;
 	char* value;
+	struct list list;
 };
 
 struct mail {
 	char* text;
 	char* timestamp;
-	struct mail_header* headers[HEADERS_COUNT];
-	int headers_count;
+	struct mail_header* headers_list;
 };
 
 struct mail* init_mail();

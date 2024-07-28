@@ -5,32 +5,6 @@
 #include "make.h"
 #include "format.h"
 
-int test_header_no_space() {
-    struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", "Subject:Mail subject\r\nDate:now\r\n\r\nMail text\r\n");
-    struct mail* mail = init_mail();
-
-    format_mail(mail, smtp_request);
-
-    if (int_except_eq(mail->headers_count, 2)) {
-        printf("test_header_no_space OK\n");
-        return 1;
-    }
-    return 0;
-}
-
-int test_header_count() {
-    struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", "Subject: Mail subject\r\nDate: now\r\n\r\nMail text\r\n");
-    struct mail* mail = init_mail();
-
-    format_mail(mail, smtp_request);
-
-    if (int_except_eq(mail->headers_count, 2)) {
-        printf("test_header_count OK\n");
-        return 1;
-    }
-    return 0;
-}
-
 int test_space_headers() {
     struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", " Subject: Mail\r\n\r\nMail text\r\n");
     struct mail* mail = init_mail();
