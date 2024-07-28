@@ -136,6 +136,7 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="buffer.c" />
     <ClCompile Include="format.c" />
+    <ClCompile Include="net.c" />
     <ClCompile Include="server.c" />
     <ClCompile Include="smtp_request.c" />
   </ItemGroup>
@@ -149,6 +150,7 @@
     <ClInclude Include="mail.h" />
     <ClInclude Include="buffer.h" />
     <ClInclude Include="format.h" />
+    <ClInclude Include="net.h" />
     <ClInclude Include="server.h" />
     <ClInclude Include="smtp_request.h" />
   </ItemGroup>

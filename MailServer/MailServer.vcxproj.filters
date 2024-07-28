@@ -51,6 +51,9 @@
     <ClCompile Include="list.c">
       <Filter>Исходные файлы\list</Filter>
     </ClCompile>
+    <ClCompile Include="net.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header.h">
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="list.h">
       <Filter>Исходные файлы\list</Filter>
+    </ClInclude>
+    <ClInclude Include="net.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

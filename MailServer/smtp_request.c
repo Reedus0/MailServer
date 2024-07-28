@@ -6,9 +6,9 @@
 
 struct smtp_request* init_smtp_request() {
 	struct smtp_request* new_smtp_request = calloc(1, sizeof(struct smtp_request));
-	new_smtp_request->mail_from = NULL;
 	new_smtp_request->domain = NULL;
 	new_smtp_request->data = NULL;
+	new_smtp_request->mail_from = NULL;
 	new_smtp_request->rcpt_to_list = NULL;
 
 	return new_smtp_request;
@@ -53,30 +53,35 @@ int smtp_request_set_data(struct smtp_request* smtp_request, char* data) {
 	return 1;
 }
 
-static clean_smtp_request_recipient(struct smtp_request_recipient* smtp_requset_recipient) {
+static int clean_smtp_request_recipient(struct smtp_request_recipient* smtp_requset_recipient) {
 	clean_email_address(smtp_requset_recipient->email_address);
 
 	free(smtp_requset_recipient);
+	return 1;
 }
 
 int clean_smtp_request(struct smtp_request* smtp_request) {
-	clean_email_address(smtp_request->mail_from);
-	
+	if (smtp_request->mail_from != NULL) {
+		clean_email_address(smtp_request->mail_from);
+	}
+
+	if (smtp_request->rcpt_to_list != NULL) {
+		struct smtp_request_recipient* current_recipient = smtp_request->rcpt_to_list;
+		struct smtp_request_recipient* prev_recipient = list_parent(current_recipient->list.prev, struct smtp_request_recipient, list);
+
+		while (1) {
+			if (current_recipient->list.prev == NULL) {
+				clean_smtp_request_recipient(current_recipient);
+				break;
+			}
+			clean_smtp_request_recipient(current_recipient);
+			current_recipient = prev_recipient;
+			prev_recipient = list_parent(prev_recipient->list.prev, struct smtp_request_recipient, list);
+		}
+	}
+
 	free(smtp_request->domain);
 	free(smtp_request->data);
-
-	struct smtp_request_recipient* current_recipient = smtp_request->rcpt_to_list;
-	struct smtp_request_recipient* prev_recipient = list_parent(current_recipient->list.prev, struct smtp_request_recipient, list);
-
-	while (1) {
-		clean_smtp_request_recipient(current_recipient);
-		current_recipient = prev_recipient;
-		if (current_recipient->list.prev == NULL) {
-			clean_smtp_request_recipient(current_recipient);
-			break;
-		}
-		prev_recipient = list_parent(prev_recipient->list.prev, struct smtp_request_recipient, list);
-	}
 
 	free(smtp_request);
 	return 1;

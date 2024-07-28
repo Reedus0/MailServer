@@ -11,37 +11,7 @@
 #include "server.h"
 #include "email_address.h"
 #include "config.h"
-
-static void clear_buffer(char* buffer) {
-	memset(buffer, 0, BUFFER_SIZE);
-}
-
-static void socket_cleanup(SOCKET sock) {
-	shutdown(sock, SD_BOTH);
-	closesocket(sock);
-}
-
-static int get_message(SOCKET sock, char* buffer) {
-	clear_buffer(buffer);
-	int status = recv(sock, buffer, BUFFER_SIZE, 0);
-	return status;
-}
-
-static int send_message(SOCKET sock, char* response) {
-	int status = send(sock, response, strlen(response), 0);
-	clear_buffer(response);
-	return status;
-}
-
-static int send_response(SOCKET sock, char* response, char* code) {
-	clear_buffer(response);
-	add_to_buffer(response, code);
-	return send_message(sock, response);
-}
-
-static int get_message_length(char* buffer) {
-	return strlen(buffer) - 2;
-}
+#include "net.h"
 
 static int serve_quit(SOCKET sock, char* buffer) {
 	int status = 0;
@@ -258,7 +228,6 @@ static int serve_data(SOCKET sock, char* buffer, struct smtp_request* smtp_reque
 
 	deliver_mail(smtp_request);
 	clean_smtp_request(smtp_request);
-	smtp_request = init_smtp_request();
 
 	return 1;
 }
@@ -274,7 +243,6 @@ static int serve_rset(SOCKET sock, char* buffer, struct smtp_request* smtp_reque
 	}
 
 	clean_smtp_request(smtp_request);
-	smtp_request = init_smtp_request();
 
 	status = send_response(sock, buffer, ACTION_OK);
 	if (status == -1) return -1;
@@ -342,14 +310,20 @@ void serve_connection(SOCKET sock) {
 		if (buffer_has_command("DATA", buffer)) {
 			status = serve_data(sock, buffer, smtp_request, current_state);
 			if (status == -1) break;
-			if (status == 1) current_state = DEFAULT;
+			if (status == 1) {
+				smtp_request = init_smtp_request();
+				current_state = DEFAULT;
+			}
 			continue;
 		}
 
 		if (buffer_has_command("RSET", buffer)) {
 			status = serve_rset(sock, buffer, smtp_request);
 			if (status == -1) break;
-			if (status == 1) current_state = DEFAULT;
+			if (status == 1) {
+				smtp_request = init_smtp_request();
+				current_state = DEFAULT;
+			}
 			continue;
 		}
 
@@ -362,6 +336,7 @@ void serve_connection(SOCKET sock) {
 		status = send_response(sock, buffer, SYNTAX_ERROR);
 		if (status == -1) break;
 	}
+	clean_smtp_request(smtp_request);
 	socket_cleanup(sock);
 	free(buffer);
 }
