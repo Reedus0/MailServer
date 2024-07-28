@@ -13,15 +13,15 @@ int test_add_multiple_recipients() {
 	smtp_request_add_recipient(smtp_request, string_to_email_address("ivan@domain.local"));
 	smtp_request_add_recipient(smtp_request, string_to_email_address("vlad@domain.local"));
 
-	struct smtp_request_recipient* last_recipient = smtp_request->rcpt_to_list;
+	struct smtp_request_recipient* current_recipient = smtp_request->rcpt_to_list;
 	int i = 0;
 
 	while (1) {
 		i += 1;
-		if (last_recipient->list.next == NULL) {
+		if (current_recipient->list.prev == NULL) {
 			break;
 		}
-		last_recipient = list_parent(last_recipient->list.next, struct smtp_request_recipient, list);
+		current_recipient = list_parent(current_recipient->list.prev, struct smtp_request_recipient, list);
 	}
 
 	if (int_except_eq(i, 4)) {

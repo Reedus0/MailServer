@@ -14,7 +14,7 @@ struct smtp_request* init_smtp_request() {
 	return new_smtp_request;
 }
 
-struct smtp_request_recipient* init_smtp_requset_recipient() {
+static struct smtp_request_recipient* init_smtp_requset_recipient() {
 	struct smtp_request_recipient* new_smtp_requset_recipient = calloc(1, sizeof(struct smtp_request_recipient));
 
 	new_smtp_requset_recipient->list = init_list();
@@ -34,12 +34,9 @@ int smtp_request_add_recipient(struct smtp_request* smtp_request, struct email_a
 	}
 
 	struct smtp_request_recipient* last_recipient = smtp_request->rcpt_to_list;
-
-	while (last_recipient->list.next != NULL) {
-		last_recipient = list_parent(last_recipient->list.next, struct smtp_request_recipient, list);
-	}
-
 	list_insert(&last_recipient->list, &new_smtp_requset_recipient->list);
+
+	smtp_request->rcpt_to_list = new_smtp_requset_recipient;
 	return 1;
 }
 
@@ -56,11 +53,30 @@ int smtp_request_set_data(struct smtp_request* smtp_request, char* data) {
 	return 1;
 }
 
+static clean_smtp_request_recipient(struct smtp_request_recipient* smtp_requset_recipient) {
+	clean_email_address(smtp_requset_recipient->email_address);
+
+	free(smtp_requset_recipient);
+}
+
 int clean_smtp_request(struct smtp_request* smtp_request) {
 	clean_email_address(smtp_request->mail_from);
 	
 	free(smtp_request->domain);
 	free(smtp_request->data);
+
+	struct smtp_request_recipient* current_recipient = smtp_request->rcpt_to_list;
+	struct smtp_request_recipient* prev_recipient = list_parent(current_recipient->list.prev, struct smtp_request_recipient, list);
+
+	while (1) {
+		clean_smtp_request_recipient(current_recipient);
+		current_recipient = prev_recipient;
+		if (current_recipient->list.prev == NULL) {
+			clean_smtp_request_recipient(current_recipient);
+			break;
+		}
+		prev_recipient = list_parent(prev_recipient->list.prev, struct smtp_request_recipient, list);
+	}
 
 	free(smtp_request);
 	return 1;
