@@ -7,10 +7,10 @@
 #include "format.h"
 #include "buffer.h"
 #include "config.h"
+#include "header.h"
 
-static int write_mail_to_file(char* recipient, char* buffer) {
-	struct config config = config_parse_file("config.txt");
-	char* mail_path = config_get_mail_path(&config);
+static enum STATUS write_mail_to_file(char* recipient, char* buffer) {
+	char* mail_path = config_get_mail_path();
 
 	int mail_path_length = strlen(mail_path);
 	int recipient_length = strlen(recipient) + 1;
@@ -18,15 +18,15 @@ static int write_mail_to_file(char* recipient, char* buffer) {
 	flush_to_buffer(full_path, mail_path_length + recipient_length + 1, "%s/%s", mail_path, recipient);
 
 	FILE* file_ptr = fopen(full_path, "a");
-
 	if (file_ptr == NULL) {
-		return -1;
+		return STATUS_ERROR;
 	}
+
 	fprintf(file_ptr, "%s", buffer);
 	fclose(file_ptr);
 	free(full_path);
 
-	return 1;
+	return STATUS_OK;
 }
 
 void deliver_mail(struct smtp_request* smtp_request) {

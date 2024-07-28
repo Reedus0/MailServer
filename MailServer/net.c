@@ -1,6 +1,11 @@
 #include <WinSock2.h>
 #include "net.h"
 
+char* init_buffer() {
+	char* new_buffer = calloc(BUFFER_SIZE, sizeof(char));
+	return new_buffer;
+}
+
 void clear_buffer(char* buffer) {
 	memset(buffer, 0, BUFFER_SIZE);
 }
@@ -30,4 +35,8 @@ int send_response(SOCKET sock, char* response, char* code) {
 
 int get_message_length(char* buffer) {
 	return strlen(buffer) - strlen("\r\n");
+}
+
+int clean_buffer(char* buffer) {
+	free(buffer);
 }

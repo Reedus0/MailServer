@@ -2,6 +2,7 @@
 #include <malloc.h>
 #include "mail.h"
 #include "buffer.h"
+#include "header.h"
 
 static struct mail_header* init_mail_header() {
 	struct mail_header* new_mail_header = calloc(1, sizeof(struct mail_header));
@@ -20,7 +21,7 @@ struct mail* init_mail() {
 	return new_mail;
 }
 
-int mail_add_header(struct mail* mail, char* name, char* value) {
+enum STATUS mail_add_header(struct mail* mail, char* name, char* value) {
 	struct mail_header* new_mail_header = init_mail_header();
 
 	new_mail_header->name = name;
@@ -28,7 +29,7 @@ int mail_add_header(struct mail* mail, char* name, char* value) {
 
 	if (mail->headers_list == NULL) {
 		mail->headers_list = new_mail_header;
-		return 1;
+		return STATUS_OK;
 	}
 
 	struct mail_header* last_header = mail->headers_list;
@@ -36,17 +37,17 @@ int mail_add_header(struct mail* mail, char* name, char* value) {
 
 	mail->headers_list = new_mail_header;
 
-	return 1;
+	return STATUS_OK;
 }
 
-int mail_set_text(struct mail* mail, char* text) {
+enum STATUS mail_set_text(struct mail* mail, char* text) {
 	mail->text = text;
-	return 1;
+	return STATUS_OK;
 }
 
-int mail_set_timestamp(struct mail* mail, char* timestamp) {
+enum STATUS mail_set_timestamp(struct mail* mail, char* timestamp) {
 	mail->timestamp = timestamp;
-	return 1;
+	return STATUS_OK;
 }
 
 char* build_mail(struct mail* mail) {
@@ -71,15 +72,15 @@ char* build_mail(struct mail* mail) {
 	return result;
 }
 
-static int clean_mail_header(struct mail_header* mail_header) {
+static enum STATUS clean_mail_header(struct mail_header* mail_header) {
 	free(mail_header->name);
 	free(mail_header->value);
 
 	free(mail_header);
-	return 1;
+	return STATUS_OK;
 }
 
-int clean_mail(struct mail* mail) {
+enum STATUS clean_mail(struct mail* mail) {
 	if (mail->headers_list != NULL) {
 		struct mail_header* current_header = mail->headers_list;
 		struct mail_header* prev_header = list_parent(current_header->list.prev, struct mail_header, list);
@@ -99,5 +100,5 @@ int clean_mail(struct mail* mail) {
 	free(mail->timestamp);
 
 	free(mail);
-	return 1;
+	return STATUS_OK;
 }

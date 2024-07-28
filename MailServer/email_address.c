@@ -3,6 +3,7 @@
 #include <malloc.h>
 #include "buffer.h"
 #include "email_address.h"
+#include "header.h"
 
 struct email_address* init_email_address() {
 	struct email_address* new_email_address = calloc(1, sizeof(struct email_address));
@@ -47,6 +48,7 @@ struct email_address* string_to_email_address(char* string) {
 
 	return email_address;
 }
+
 char* email_address_to_string(struct email_address* email_address) {
 	int user_length = strlen(email_address->user);
 	int domain_length = strlen(email_address->domain) + 1;
@@ -58,10 +60,20 @@ char* email_address_to_string(struct email_address* email_address) {
 	return result;
 }
 
-int clean_email_address(struct email_address* email_address) {
+enum STATUS email_address_set_user(struct email_address* email_address, char* user) {
+	email_address->user = user;
+	return STATUS_OK;
+}
+
+enum STATUS email_address_set_domain(struct email_address* email_address, char* domain) {
+	email_address->domain = domain;
+	return STATUS_OK;
+}
+
+enum STATUS clean_email_address(struct email_address* email_address) {
 	free(email_address->user);
 	free(email_address->domain);
 
 	free(email_address);
-	return 1;
+	return STATUS_OK;
 }

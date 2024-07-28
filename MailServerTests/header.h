@@ -8,3 +8,4 @@
 #include "config.c"
 #include "format.c"
 #include "list.c"
+#include "header.h"

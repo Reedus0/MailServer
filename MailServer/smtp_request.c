@@ -3,6 +3,7 @@
 #include "smtp_request.h"
 #include "email_address.h"
 #include "list.h"
+#include "header.h"
 
 struct smtp_request* init_smtp_request() {
 	struct smtp_request* new_smtp_request = calloc(1, sizeof(struct smtp_request));
@@ -23,44 +24,44 @@ static struct smtp_request_recipient* init_smtp_request_recipient() {
 	return new_smtp_request_recipient;
 }
 
-int smtp_request_add_recipient(struct smtp_request* smtp_request, struct email_address* recipient) {
+enum STATUS smtp_request_add_recipient(struct smtp_request* smtp_request, struct email_address* recipient) {
 	struct smtp_request_recipient* new_smtp_request_recipient = init_smtp_request_recipient();
 
 	new_smtp_request_recipient->email_address = recipient;
 
 	if (smtp_request->rcpt_to_list == NULL) {
 		smtp_request->rcpt_to_list = new_smtp_request_recipient;
-		return 1;
+		return STATUS_OK;
 	}
 
 	struct smtp_request_recipient* last_recipient = smtp_request->rcpt_to_list;
 	list_insert(&last_recipient->list, &new_smtp_request_recipient->list);
 
 	smtp_request->rcpt_to_list = new_smtp_request_recipient;
-	return 1;
+	return STATUS_OK;
 }
 
-int smtp_request_set_mail_from(struct smtp_request* smtp_request, struct email_address* mail_from) {
+enum STATUS smtp_request_set_mail_from(struct smtp_request* smtp_request, struct email_address* mail_from) {
 	smtp_request->mail_from = mail_from;
-	return 1;
+	return STATUS_OK;
 }
-int smtp_request_set_domain(struct smtp_request* smtp_request, char* domain) {
+enum STATUS smtp_request_set_domain(struct smtp_request* smtp_request, char* domain) {
 	smtp_request->domain = domain;
-	return 1;
+	return STATUS_OK;
 }
-int smtp_request_set_data(struct smtp_request* smtp_request, char* data) {
+enum STATUS smtp_request_set_data(struct smtp_request* smtp_request, char* data) {
 	smtp_request->data = data;
-	return 1;
+	return STATUS_OK;
 }
 
-static int clean_smtp_request_recipient(struct smtp_request_recipient* smtp_request_recipient) {
+static enum STATUS clean_smtp_request_recipient(struct smtp_request_recipient* smtp_request_recipient) {
 	if (smtp_request_recipient->email_address != NULL) clean_email_address(smtp_request_recipient->email_address);
 
 	free(smtp_request_recipient);
-	return 1;
+	return STATUS_OK;
 }
 
-int clean_smtp_request(struct smtp_request* smtp_request) {
+enum STATUS clean_smtp_request(struct smtp_request* smtp_request) {
 	if (smtp_request->mail_from != NULL) {
 		clean_email_address(smtp_request->mail_from);
 	}
@@ -84,5 +85,5 @@ int clean_smtp_request(struct smtp_request* smtp_request) {
 	free(smtp_request->data);
 
 	free(smtp_request);
-	return 1;
+	return STATUS_OK;
 }

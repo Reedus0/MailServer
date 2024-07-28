@@ -19,6 +19,9 @@
     <Filter Include="Исходные файлы\list">
       <UniqueIdentifier>{305f33da-2163-4760-94e0-01da7a2c5460}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\smtp">
+      <UniqueIdentifier>{7a32ac1a-dd62-4c7e-95f6-59ec64a2d1e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -53,6 +56,18 @@
     </ClCompile>
     <ClCompile Include="net.c">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="smtp_mail_from.c">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="smtp_data.c">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="smtp_rcpt_to.c">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="smtp_helo.c">
+      <Filter>Исходные файлы\smtp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +106,18 @@
     </ClInclude>
     <ClInclude Include="net.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="smtp_data.h">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="smtp_mail_from.h">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="smtp_rcpt_to.h">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="smtp_helo.h">
+      <Filter>Исходные файлы\smtp</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -9,5 +9,5 @@ struct list {
 };
 
 struct list init_list();
-int list_insert(struct list* base_list, struct list* new_list);
-int list_remove(struct list* removed_list);
+enum STATUS list_insert(struct list* base_list, struct list* new_list);
+enum STATUS list_remove(struct list* removed_list);

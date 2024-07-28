@@ -6,6 +6,7 @@
 #include "smtp_request.h"
 #include "buffer.h"
 #include "config.h"
+#include "header.h"
 
 static int add_single_header(struct mail* mail, char* header_line) {
 
@@ -42,7 +43,7 @@ static char* get_header_line(char* mait_text) {
 	return header_line;
 }
 
-static int mail_parse_headers(struct mail* mail, char* mail_text) {
+static enum STATUS mail_parse_headers(struct mail* mail, char* mail_text) {
 	char* char_pointer = strstr(mail_text, "\r\n");
 	char* end_of_headers = strstr(mail_text, "\r\n\r\n");
 	char* base_line = mail_text;
@@ -52,11 +53,11 @@ static int mail_parse_headers(struct mail* mail, char* mail_text) {
 		if (current_line == NULL || *current_line == NULL) {
 			char* new_text = copy_buffer(base_line);
 			mail_set_text(mail, new_text);
-			return 0;
+			return STATUS_NOT_OK;
 		}
 
 		if (!add_single_header(mail, current_line)) {
-			return 0;
+			return STATUS_NOT_OK;
 		}
 		
 		free(current_line);
@@ -68,7 +69,7 @@ static int mail_parse_headers(struct mail* mail, char* mail_text) {
 	char* new_text = copy_buffer(end_of_headers + strlen("\r\n\r\n"));
 	mail_set_text(mail, new_text);
 
-	return 1;
+	return STATUS_OK;
 }
 
 static char* get_time_string() {
@@ -80,7 +81,7 @@ static char* get_time_string() {
 	return time_string;
 }
 
-static int mail_get_timestamp(struct mail* mail, struct email_address* mail_from) {
+static enum STATUS mail_get_timestamp(struct mail* mail, struct email_address* mail_from) {
 	char* mail_from_string = email_address_to_string(mail_from);
 
 	char* time_string = get_time_string();
@@ -92,11 +93,11 @@ static int mail_get_timestamp(struct mail* mail, struct email_address* mail_from
 
 	mail_set_timestamp(mail, timestamp);
 
-	return 1;
+	return STATUS_OK;
 }
 
-static int mail_add_server_headers(struct mail* mail) {
-	return 1;
+static enum STATUS mail_add_server_headers(struct mail* mail) {
+	return STATUS_OK;
 }
 
 int format_mail(struct mail* mail, struct smtp_request* smtp_request) {
@@ -104,5 +105,5 @@ int format_mail(struct mail* mail, struct smtp_request* smtp_request) {
 	mail_add_server_headers(mail);
 	mail_parse_headers(mail, smtp_request->data);
 
-	return 1;
+	return STATUS_OK;
 }

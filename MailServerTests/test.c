@@ -55,5 +55,5 @@ int main(int argv, char* argc[]) {
     };
     test_list("format", format_tests);
 
-    return 0;
+    return STATUS_NOT_OK;
 }

@@ -12,7 +12,7 @@ int main(int argv, char* argc[]) {
     thrd_t new_thread;
     WSADATA wsa_data;
 
-    struct config config = config_parse_file("config.txt");
+    config_parse_file("config.txt");
 
     int status = WSAStartup(MAKEWORD(2, 2), &wsa_data);
     if (status != 0) {
@@ -24,7 +24,7 @@ int main(int argv, char* argc[]) {
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = INADDR_ANY;
-    server_address.sin_port = htons(config_get_listen_port(&config));
+    server_address.sin_port = htons(config_get_listen_port());
 
     bind(sock, (struct sockaddr*)&server_address, sizeof(server_address));
     listen(sock, MAX_PENDING_CONNECTIONS);

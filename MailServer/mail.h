@@ -18,8 +18,8 @@ struct mail {
 };
 
 struct mail* init_mail();
-int mail_add_header(struct mail* mail, char* name, char* value);
-int mail_set_text(struct mail* mail, char* text);
-int mail_set_timestamp(struct mail* mail, char* timestamp);
+enum STATUS mail_add_header(struct mail* mail, char* name, char* value);
+enum STATUS mail_set_text(struct mail* mail, char* text);
+enum STATUS mail_set_timestamp(struct mail* mail, char* timestamp);
 char* build_mail(struct mail* mail);
-int clean_mail(struct mail* mail);
+enum STATUS clean_mail(struct mail* mail);

@@ -138,6 +138,10 @@
     <ClCompile Include="format.c" />
     <ClCompile Include="net.c" />
     <ClCompile Include="server.c" />
+    <ClCompile Include="smtp_data.c" />
+    <ClCompile Include="smtp_helo.c" />
+    <ClCompile Include="smtp_mail_from.c" />
+    <ClCompile Include="smtp_rcpt_to.c" />
     <ClCompile Include="smtp_request.c" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +156,10 @@
     <ClInclude Include="format.h" />
     <ClInclude Include="net.h" />
     <ClInclude Include="server.h" />
+    <ClInclude Include="smtp_data.h" />
+    <ClInclude Include="smtp_helo.h" />
+    <ClInclude Include="smtp_mail_from.h" />
+    <ClInclude Include="smtp_rcpt_to.h" />
     <ClInclude Include="smtp_request.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
