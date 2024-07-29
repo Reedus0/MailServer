@@ -62,7 +62,9 @@ enum STATUS smtp_request_set_data(struct smtp_request* smtp_request, char* data)
 }
 
 static enum STATUS clean_smtp_request_recipient(struct smtp_request_recipient* smtp_request_recipient) {
-	if (smtp_request_recipient->email_address != NULL) clean_email_address(smtp_request_recipient->email_address);
+	if (smtp_request_recipient->email_address != NULL) {
+		clean_email_address(smtp_request_recipient->email_address);
+	}
 
 	free(smtp_request_recipient);
 	return STATUS_OK;

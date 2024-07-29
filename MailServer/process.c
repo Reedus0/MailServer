@@ -29,22 +29,24 @@ static enum STATUS write_mail_to_file(char* recipient, char* buffer) {
 	return STATUS_OK;
 }
 
-void deliver_mail(struct smtp_request* smtp_request) {
+static enum STATUS deliver_mail(struct mail* mail, struct smtp_request_recipient* smtp_request_recipient) {
+	char* final_text = build_mail(mail);
+	write_mail_to_file(smtp_request_recipient->email_address->user, final_text);
+	free(final_text);
+}
+
+void process_smtp_request(struct smtp_request* smtp_request) {
 	struct mail* mail = init_mail();
 
 	format_mail(mail, smtp_request);
 	
 	struct smtp_request_recipient* last_recipient = smtp_request->rcpt_to_list;
 	while (1) {
-		if (last_recipient->email_address->user != NULL && last_recipient->email_address->domain != NULL) {
-			char* final_text = build_mail(mail);
-			write_mail_to_file(last_recipient->email_address->user, final_text);
-			free(final_text);
-		}
-		if (last_recipient->list.next == NULL) {
+		deliver_mail(mail, last_recipient);
+		if (last_recipient->list.prev == NULL) {
 			break;
 		}
-		last_recipient = list_parent(last_recipient->list.next, struct smtp_request_recipient, list);
+		last_recipient = list_parent(last_recipient->list.prev, struct smtp_request_recipient, list);
 	}
 
 	clean_mail(mail);

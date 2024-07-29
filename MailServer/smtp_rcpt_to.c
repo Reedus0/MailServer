@@ -59,6 +59,7 @@ enum STATUS serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_r
 
 	if (!validate_user(rcpt_to_email_address)) {
 		send_response(sock, buffer, USER_NOT_LOCAL);
+		clean_email_address(rcpt_to_email_address);
 		return STATUS_NOT_OK;
 	}
 

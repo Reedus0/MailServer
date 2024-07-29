@@ -3,7 +3,6 @@
 #include "email_address.h"
 #include "func.h"
 #include "make.h"
-#include "delivery.h"
 
 int test_add_multiple_recipients() {
 	struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", "Mail text\r\n");

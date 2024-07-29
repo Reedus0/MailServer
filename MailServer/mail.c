@@ -24,8 +24,8 @@ struct mail* init_mail() {
 enum STATUS mail_add_header(struct mail* mail, char* name, char* value) {
 	struct mail_header* new_mail_header = init_mail_header();
 
-	new_mail_header->name = name;
-	new_mail_header->value = value;
+	new_mail_header->name = copy_buffer(name);
+	new_mail_header->value = copy_buffer(value);
 
 	if (mail->headers_list == NULL) {
 		mail->headers_list = new_mail_header;
@@ -72,15 +72,14 @@ enum STATUS mail_add_header_if_not_exists(struct mail* mail, char* name, char* v
 }
 
 enum STATUS mail_set_text(struct mail* mail, char* text) {
-	mail->text = text;
+	mail->text = copy_buffer(text);
 	return STATUS_OK;
 }
 
 enum STATUS mail_set_timestamp(struct mail* mail, char* timestamp) {
-	mail->timestamp = timestamp;
+	mail->timestamp = copy_buffer(timestamp);
 	return STATUS_OK;
 }
-
 
 char* build_mail(struct mail* mail) {
 	char* result = calloc(MAIL_SIZE, sizeof(char));

@@ -45,7 +45,7 @@
     <ClCompile Include="buffer.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="delivery.c">
+    <ClCompile Include="process.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="config.c">
@@ -101,7 +101,7 @@
     <ClInclude Include="buffer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="delivery.h">
+    <ClInclude Include="process.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="config.h">

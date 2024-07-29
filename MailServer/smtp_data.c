@@ -6,7 +6,6 @@
 #include "server.h"
 #include "net.h"
 #include "buffer.h"
-#include "delivery.h"
 #include "smtp_request.h"
 #include "validation.h"
 #include "server_session.h"
@@ -59,9 +58,6 @@ enum STATUS serve_data(SOCKET sock, char* buffer, struct smtp_request* smtp_requ
 	smtp_request_set_data(smtp_request, smtp_data);
 
 	send_response(sock, buffer, ACTION_OK);
-
-	deliver_mail(smtp_request);
-	clean_smtp_request(smtp_request);
 
 	return STATUS_OK;
 }

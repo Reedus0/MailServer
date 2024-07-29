@@ -54,7 +54,7 @@ int main(int argv, char* argc[]) {
         test_no_headers,
         test_space_headers,
         test_has_header,
-        test_has_to_header_with_two_recipients,
+        test_HAS_RCPT_TO_header_with_two_recipients,
         NULL
     };
     test_list("format", format_tests);

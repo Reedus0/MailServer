@@ -8,4 +8,4 @@ int test_pre_enter();
 int test_no_headers();
 int test_space_headers();
 int test_has_header();
-int test_has_to_header_with_two_recipients();
+int test_HAS_RCPT_TO_header_with_two_recipients();

@@ -2,9 +2,9 @@
 
 enum server_states {
 	DEFAULT = 0,
-	HAS_DOMAIN = 1,
-	HAS_FROM = 2,
-	HAS_TO = 3,
+	INITIALIZED = 1,
+	HAS_MAIL_FROM = 2,
+	HAS_RCPT_TO = 3,
 };
 
 struct server_session {

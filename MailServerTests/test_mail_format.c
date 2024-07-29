@@ -5,7 +5,7 @@
 #include "make.h"
 #include "mail_format.h"
 
-int test_has_to_header_with_two_recipients() {
+int test_HAS_RCPT_TO_header_with_two_recipients() {
     struct smtp_request* smtp_request = make_smtp_request("host.domain.local", "john@domain.local", "john@domain.local", "Subject: Mail\r\nDate: now\r\n\r\nMail text\r\n");
     struct mail* mail = init_mail();
 
@@ -14,7 +14,7 @@ int test_has_to_header_with_two_recipients() {
     format_mail(mail, smtp_request);
 
     if (string_except_eq(mail_get_header_value(mail, "To"), "carl@domain.local, john@domain.local")) {
-        printf("test_has_to_header_with_two_recipients OK\n");
+        printf("test_HAS_RCPT_TO_header_with_two_recipients OK\n");
         return 1;
     }
     return 0;

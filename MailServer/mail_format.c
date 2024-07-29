@@ -9,14 +9,19 @@
 #include "header.h"
 #include "mail_format.h"
 
-static int add_single_header(struct mail* mail, char* header_line) {
+static enum STATUS add_single_header(struct mail* mail, char* header_line) {
 
 	char* new_name = get_field_from_buffer(header_line, ":");
 	new_name = trim_string(new_name);
 	char* new_value = get_value_from_buffer(header_line, ":");
 	new_value = trim_string(new_value);
 
-	return mail_add_header(mail, new_name, new_value);
+	mail_add_header(mail, new_name, new_value);
+
+	free(new_name);
+	free(new_value);
+
+	return STATUS_OK;
 }
 
 static char* get_header_line(char* mait_text) {
@@ -52,7 +57,7 @@ static enum STATUS mail_parse_headers(struct mail* mail, char* mail_text) {
 		char* current_line = get_header_line(base_line);
 
 		if (current_line == NULL || *current_line == NULL) {
-			char* new_text = copy_buffer(base_line);
+			char* new_text = base_line;
 			mail_set_text(mail, new_text);
 			return STATUS_NOT_OK;
 		}
@@ -67,7 +72,7 @@ static enum STATUS mail_parse_headers(struct mail* mail, char* mail_text) {
 		char_pointer = strstr(base_line, "\r\n");
 	}
 
-	char* new_text = copy_buffer(end_of_headers + strlen("\r\n\r\n"));
+	char* new_text = end_of_headers + strlen("\r\n\r\n");
 	mail_set_text(mail, new_text);
 
 	return STATUS_OK;
@@ -94,6 +99,8 @@ static enum STATUS mail_add_timestamp(struct mail* mail, struct email_address* m
 
 	mail_set_timestamp(mail, timestamp);
 
+	free(timestamp);
+
 	return STATUS_OK;
 }
 
@@ -105,6 +112,7 @@ static char* get_all_recipients(struct smtp_request* smtp_request) {
 		char* recipient_user = email_address_to_string(current_recipient->email_address);
 		if (current_recipient->list.prev == NULL) {
 			add_to_buffer(result, recipient_user);
+			free(recipient_user);
 			break;
 		}
 		int recipient_user_length = strlen(recipient_user);
@@ -134,19 +142,23 @@ static char* get_received(char* hostname) {
 }
 
 static enum STATUS mail_add_server_headers(struct mail* mail, struct smtp_request* smtp_request) {
-	mail_add_header_if_not_exists(mail, "From", email_address_to_string(smtp_request->mail_from));
+	char* mail_from_string = email_address_to_string(smtp_request->mail_from);
+	mail_add_header_if_not_exists(mail, "From", mail_from_string);
+	free(mail_from_string);
 	char* all_recipients = get_all_recipients(smtp_request);
 	mail_add_header_if_not_exists(mail, "To", all_recipients);
 	mail_add_header(mail, "X-Original-To", all_recipients);
+	free(all_recipients);
 	char* received = get_received(smtp_request->hostname);
 	mail_add_header(mail, "Received", received);
+	free(received);
 	return STATUS_OK;
 }
 
 int format_mail(struct mail* mail, struct smtp_request* smtp_request) {
 	mail_parse_headers(mail, smtp_request->data);
 	mail_add_timestamp(mail, smtp_request->mail_from);
-	//mail_add_server_headers(mail, smtp_request);
+	mail_add_server_headers(mail, smtp_request);
 
 	return STATUS_OK;
 }
