@@ -7,6 +7,7 @@
 #include "server.h"
 #include "buffer.h"
 #include "smtp_request.h"
+#include "validation.h"
 
 enum STATUS serve_mail_from(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
 	if (validate_with_args(buffer, "MAIL FROM:", ":") == STATUS_NOT_OK) {

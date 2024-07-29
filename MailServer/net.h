@@ -1,5 +1,7 @@
 #pragma once
 
+#include <WinSock2.h>
+
 #define BUFFER_SIZE 128
 
 char* init_buffer();

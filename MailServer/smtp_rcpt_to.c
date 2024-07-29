@@ -9,6 +9,7 @@
 #include "buffer.h"
 #include "smtp_request.h"
 #include "config.h"
+#include "validation.h"
 
 static enum STATUS check_domain(char* domain, char* server_domain) {
 	return !memcmp(domain, server_domain, strlen(server_domain));
@@ -39,7 +40,7 @@ static enum STATUS validate_user(struct email_address* user) {
 	return STATUS_OK;
 }
 
-enum STATUS serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_request, enum server_states current_state) {
+enum STATUS serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
 	if (validate_with_args(buffer, "RCPT TO:", ":") == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;

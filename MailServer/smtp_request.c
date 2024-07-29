@@ -4,10 +4,12 @@
 #include "email_address.h"
 #include "list.h"
 #include "header.h"
+#include "server_session.h"
+#include "buffer.h"
 
 struct smtp_request* init_smtp_request() {
 	struct smtp_request* new_smtp_request = calloc(1, sizeof(struct smtp_request));
-	new_smtp_request->domain = NULL;
+	new_smtp_request->hostname = NULL;
 	new_smtp_request->data = NULL;
 	new_smtp_request->mail_from = NULL;
 	new_smtp_request->rcpt_to_list = NULL;
@@ -22,6 +24,11 @@ static struct smtp_request_recipient* init_smtp_request_recipient() {
 	new_smtp_request_recipient->email_address = NULL;
 
 	return new_smtp_request_recipient;
+}
+
+enum STATUS smtp_request_set_session(struct smtp_request* smtp_request, struct server_session* server_session) {
+	smtp_request->hostname = copy_buffer(server_session->hostname);
+	return STATUS_OK;
 }
 
 enum STATUS smtp_request_add_recipient(struct smtp_request* smtp_request, struct email_address* recipient) {
@@ -45,8 +52,8 @@ enum STATUS smtp_request_set_mail_from(struct smtp_request* smtp_request, struct
 	smtp_request->mail_from = mail_from;
 	return STATUS_OK;
 }
-enum STATUS smtp_request_set_domain(struct smtp_request* smtp_request, char* domain) {
-	smtp_request->domain = domain;
+enum STATUS smtp_request_set_hostname(struct smtp_request* smtp_request, char* hostname) {
+	smtp_request->hostname = hostname;
 	return STATUS_OK;
 }
 enum STATUS smtp_request_set_data(struct smtp_request* smtp_request, char* data) {
@@ -81,7 +88,7 @@ enum STATUS clean_smtp_request(struct smtp_request* smtp_request) {
 		}
 	}
 
-	free(smtp_request->domain);
+	free(smtp_request->hostname);
 	free(smtp_request->data);
 
 	free(smtp_request);

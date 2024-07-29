@@ -3,7 +3,7 @@
 #include "mail.h"
 #include "func.h"
 #include "make.h"
-#include "format.h"
+#include "mail_format.h"
 
 int test_make_email_string_normal() {
     struct email_address* email_address = make_email_address("john@domain.local");

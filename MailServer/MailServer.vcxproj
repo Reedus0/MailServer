@@ -135,14 +135,16 @@
     <ClCompile Include="mail.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="buffer.c" />
-    <ClCompile Include="format.c" />
+    <ClCompile Include="mail_format.c" />
     <ClCompile Include="net.c" />
     <ClCompile Include="server.c" />
+    <ClCompile Include="server_session.c" />
     <ClCompile Include="smtp_data.c" />
     <ClCompile Include="smtp_helo.c" />
     <ClCompile Include="smtp_mail_from.c" />
     <ClCompile Include="smtp_rcpt_to.c" />
     <ClCompile Include="smtp_request.c" />
+    <ClCompile Include="validation.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="codes.h" />
@@ -153,14 +155,16 @@
     <ClInclude Include="list.h" />
     <ClInclude Include="mail.h" />
     <ClInclude Include="buffer.h" />
-    <ClInclude Include="format.h" />
+    <ClInclude Include="mail_format.h" />
     <ClInclude Include="net.h" />
     <ClInclude Include="server.h" />
+    <ClInclude Include="server_session.h" />
     <ClInclude Include="smtp_data.h" />
     <ClInclude Include="smtp_helo.h" />
     <ClInclude Include="smtp_mail_from.h" />
     <ClInclude Include="smtp_rcpt_to.h" />
     <ClInclude Include="smtp_request.h" />
+    <ClInclude Include="validation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

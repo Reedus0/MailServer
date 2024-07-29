@@ -7,9 +7,10 @@
 
 void config_parse_file(char* filename) {
 	config.domain = "domain.local";
-	config.mail_path = ".";
+	config.mail_path = "E:/";
 	config.listen_port = 1025;
 	config.users = "john";
+	config.hostname = "server";
 }
 
 char* config_get_domain() {
@@ -26,4 +27,8 @@ char* config_get_users() {
 
 char* config_get_listen_port() {
 	return config.listen_port;
+}
+
+char* config_get_hostname() {
+	return config.hostname;
 }

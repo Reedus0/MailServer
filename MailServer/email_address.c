@@ -51,11 +51,11 @@ struct email_address* string_to_email_address(char* string) {
 
 char* email_address_to_string(struct email_address* email_address) {
 	int user_length = strlen(email_address->user);
-	int domain_length = strlen(email_address->domain) + 1;
+	int domain_length = strlen(email_address->domain);
 
-	char* result = calloc(user_length + domain_length + 2, sizeof(char));
+	char* result = calloc(user_length + domain_length + 3, sizeof(char));
 
-	flush_to_buffer(result, user_length + domain_length + 1, "%s@%s", email_address->user, email_address->domain);
+	flush_to_buffer(result, user_length + domain_length + 2, "%s@%s", email_address->user, email_address->domain);
 
 	return result;
 }

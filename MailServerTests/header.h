@@ -6,6 +6,6 @@
 #include "mail.c"
 #include "buffer.c"
 #include "config.c"
-#include "format.c"
+#include "mail_format.c"
 #include "list.c"
 #include "header.h"

@@ -67,3 +67,13 @@ int buffer_has_command(char* command, char* message) {
 int is_empty_string(char* string) {
 	return strlen(string) == 0;
 }
+
+int compare_strings(char* first, char* second) {
+	if (strlen(first) != strlen(second)) {
+		return 0;
+	}
+	if (memcmp(first, second, strlen(first))) {
+		return 0;
+	}
+	return 1;
+}

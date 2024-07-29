@@ -8,3 +8,4 @@ char* get_value_from_buffer(char* message, char* separator);
 int buffer_has_command(char* command, char* message);
 char* trim_string(char* string);
 int is_empty_string(char* string);
+int compare_strings(char* first, char* second);

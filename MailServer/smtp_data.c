@@ -6,6 +6,10 @@
 #include "server.h"
 #include "net.h"
 #include "buffer.h"
+#include "delivery.h"
+#include "smtp_request.h"
+#include "validation.h"
+#include "server_session.h"
 
 static enum STATUS delete_dots(char* buffer) {
 	char* dot_pointer = strstr(buffer, "\r\n.", 3);
@@ -15,6 +19,7 @@ static enum STATUS delete_dots(char* buffer) {
 		add_to_buffer(buffer, dot_pointer);
 		dot_pointer = strstr(dot_pointer, "\r\n.", 3);
 	}
+	*(buffer + strlen(buffer) - 2) = 0;
 	return STATUS_OK;
 }
 
@@ -42,7 +47,7 @@ static char* get_smtp_data(SOCKET sock, char* buffer) {
 	return message;
 }
 
-enum STATUS serve_data(SOCKET sock, char* buffer, struct smtp_request* smtp_request, enum server_states current_state) {
+enum STATUS serve_data(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
 	if (validate_without_args(buffer, "DATA") == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;

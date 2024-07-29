@@ -3,12 +3,12 @@
 #include "smtp_request.h"
 #include "email_address.h"
 
-struct smtp_request* make_smtp_request(char* domain, char* mail_from, char* rcpt_to, char* data) {
+struct smtp_request* make_smtp_request(char* hostname, char* mail_from, char* rcpt_to, char* data) {
     struct smtp_request* smtp_request = init_smtp_request();
 
-    char* smtp_request_domain = calloc(strlen(domain) + 1, sizeof(char));
-    memcpy(smtp_request_domain, domain, strlen(domain));
-    smtp_request_set_domain(smtp_request, smtp_request_domain);
+    char* smtp_request_hostname = calloc(strlen(hostname) + 1, sizeof(char));
+    memcpy(smtp_request_hostname, hostname, strlen(hostname));
+    smtp_request_set_hostname(smtp_request, smtp_request_hostname);
 
     char* smtp_request_data = calloc(strlen(data) + 1, sizeof(char));
     memcpy(smtp_request_data, data, strlen(data));

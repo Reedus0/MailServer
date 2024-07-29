@@ -2,7 +2,7 @@
 #include <string.h>
 #include "header.h"
 
-#include "test_format.h"
+#include "test_mail_format.h"
 #include "test_email_address.h"
 #include "test_list.h"
 #include "test_smtp_request.h"
@@ -20,6 +20,8 @@ int test_list(char* list_name, int (*tests[])()) {
 }
 
 int main(int argv, char* argc[]) {
+
+    config_parse_file("config.txt");
 
     int (*list_tests[])() = {
         test_list_insert,
@@ -51,6 +53,8 @@ int main(int argv, char* argc[]) {
         test_pre_enter,
         test_no_headers,
         test_space_headers,
+        test_has_header,
+        test_has_to_header_with_two_recipients,
         NULL
     };
     test_list("format", format_tests);

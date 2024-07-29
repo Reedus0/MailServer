@@ -16,11 +16,23 @@
     <Filter Include="Исходные файлы\structures">
       <UniqueIdentifier>{a964b0b9-b961-4a23-9f69-c21a9bd81b77}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\list">
-      <UniqueIdentifier>{305f33da-2163-4760-94e0-01da7a2c5460}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Исходные файлы\smtp">
       <UniqueIdentifier>{7a32ac1a-dd62-4c7e-95f6-59ec64a2d1e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\structures\email_address">
+      <UniqueIdentifier>{8ddbce6d-09c5-4637-b30a-f74ef97f6c8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\structures\mail">
+      <UniqueIdentifier>{e3f1b3b0-0f2e-41e7-98a8-48af8d221d4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\structures\smtp_request">
+      <UniqueIdentifier>{6646989c-234e-4b2e-9d88-2140d6c297be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\structures\list">
+      <UniqueIdentifier>{305f33da-2163-4760-94e0-01da7a2c5460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\structures\server_session">
+      <UniqueIdentifier>{77d13915-730a-4663-ada5-86ed919689ef}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -36,23 +48,11 @@
     <ClCompile Include="delivery.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="format.c">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="mail.c">
-      <Filter>Исходные файлы\structures</Filter>
-    </ClCompile>
-    <ClCompile Include="smtp_request.c">
-      <Filter>Исходные файлы\structures</Filter>
-    </ClCompile>
-    <ClCompile Include="email_address.c">
-      <Filter>Исходные файлы\structures</Filter>
-    </ClCompile>
     <ClCompile Include="config.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="list.c">
-      <Filter>Исходные файлы\list</Filter>
+      <Filter>Исходные файлы\structures\list</Filter>
     </ClCompile>
     <ClCompile Include="net.c">
       <Filter>Исходные файлы</Filter>
@@ -67,6 +67,24 @@
       <Filter>Исходные файлы\smtp</Filter>
     </ClCompile>
     <ClCompile Include="smtp_helo.c">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="email_address.c">
+      <Filter>Исходные файлы\structures\email_address</Filter>
+    </ClCompile>
+    <ClCompile Include="mail.c">
+      <Filter>Исходные файлы\structures\mail</Filter>
+    </ClCompile>
+    <ClCompile Include="smtp_request.c">
+      <Filter>Исходные файлы\structures\smtp_request</Filter>
+    </ClCompile>
+    <ClCompile Include="mail_format.c">
+      <Filter>Исходные файлы\structures\mail</Filter>
+    </ClCompile>
+    <ClCompile Include="server_session.c">
+      <Filter>Исходные файлы\structures\server_session</Filter>
+    </ClCompile>
+    <ClCompile Include="validation.c">
       <Filter>Исходные файлы\smtp</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,23 +104,11 @@
     <ClInclude Include="delivery.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="format.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="smtp_request.h">
-      <Filter>Исходные файлы\structures</Filter>
-    </ClInclude>
-    <ClInclude Include="mail.h">
-      <Filter>Исходные файлы\structures</Filter>
-    </ClInclude>
-    <ClInclude Include="email_address.h">
-      <Filter>Исходные файлы\structures</Filter>
-    </ClInclude>
     <ClInclude Include="config.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="list.h">
-      <Filter>Исходные файлы\list</Filter>
+      <Filter>Исходные файлы\structures\list</Filter>
     </ClInclude>
     <ClInclude Include="net.h">
       <Filter>Файлы заголовков</Filter>
@@ -117,6 +123,24 @@
       <Filter>Исходные файлы\smtp</Filter>
     </ClInclude>
     <ClInclude Include="smtp_helo.h">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="email_address.h">
+      <Filter>Исходные файлы\structures\email_address</Filter>
+    </ClInclude>
+    <ClInclude Include="mail.h">
+      <Filter>Исходные файлы\structures\mail</Filter>
+    </ClInclude>
+    <ClInclude Include="smtp_request.h">
+      <Filter>Исходные файлы\structures\smtp_request</Filter>
+    </ClInclude>
+    <ClInclude Include="mail_format.h">
+      <Filter>Исходные файлы\structures\mail</Filter>
+    </ClInclude>
+    <ClInclude Include="server_session.h">
+      <Filter>Исходные файлы\structures\server_session</Filter>
+    </ClInclude>
+    <ClInclude Include="validation.h">
       <Filter>Исходные файлы\smtp</Filter>
     </ClInclude>
   </ItemGroup>

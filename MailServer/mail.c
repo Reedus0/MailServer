@@ -40,6 +40,37 @@ enum STATUS mail_add_header(struct mail* mail, char* name, char* value) {
 	return STATUS_OK;
 }
 
+char* mail_get_header_value(struct mail* mail, char* name) {
+	struct mail_header* current_header = mail->headers_list;
+	if (current_header == NULL) {
+		return STATUS_NOT_OK;
+	}
+	while (1) {
+		if (compare_strings(current_header->name, name)) {
+			return current_header->value;
+		}
+		if (current_header->list.prev == NULL) {
+			break;
+		}
+		current_header = list_parent(current_header->list.prev, struct mail_header, list);
+	}
+	return NULL;
+}
+
+enum STATUS mail_has_header(struct mail* mail, char* name) {
+	if (mail_get_header_value(mail, name) == NULL) {
+		return STATUS_NOT_OK;
+	}
+	return STATUS_OK;
+}
+
+enum STATUS mail_add_header_if_not_exists(struct mail* mail, char* name, char* value) {
+	if (!mail_has_header(mail, name)) {
+		mail_add_header(mail, name, value);
+	}
+	return STATUS_OK;
+}
+
 enum STATUS mail_set_text(struct mail* mail, char* text) {
 	mail->text = text;
 	return STATUS_OK;
@@ -50,6 +81,7 @@ enum STATUS mail_set_timestamp(struct mail* mail, char* timestamp) {
 	return STATUS_OK;
 }
 
+
 char* build_mail(struct mail* mail) {
 	char* result = calloc(MAIL_SIZE, sizeof(char));
 	add_to_buffer(result, mail->timestamp);
@@ -58,16 +90,16 @@ char* build_mail(struct mail* mail) {
 
 	while (1) {
 		int name_length = strlen(current_header->name);
-		int value_length = strlen(current_header->value) + 1;
-		flush_to_buffer(result, name_length + value_length + 4, "%s: %s\r\n", current_header->name, current_header->value);
+		int value_length = strlen(current_header->value);
+		flush_to_buffer(result, name_length + value_length + 5, "%s: %s\r\n", current_header->name, current_header->value);
 		if (current_header->list.prev == NULL) {
 			break;
 		}
 		current_header = list_parent(current_header->list.prev, struct mail_header, list);
 	}
 
-	int text_length = strlen(mail->text) + 1;
-	flush_to_buffer(result, text_length + 4, "\r\n%s\r\n", mail->text);
+	int text_length = strlen(mail->text);
+	flush_to_buffer(result, text_length + 5, "\r\n%s\r\n", mail->text);
 
 	return result;
 }

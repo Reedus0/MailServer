@@ -9,6 +9,7 @@ struct config {
 	char* mail_path;
 	char* users;
 	short listen_port;
+	char* hostname;
 } config;
 
 void config_parse_file(char* filename);
@@ -16,3 +17,4 @@ char* config_get_domain();
 char* config_get_mail_path();
 char* config_get_users();
 char* config_get_listen_port();
+char* config_get_hostname();

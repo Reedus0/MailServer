@@ -24,7 +24,7 @@
     <ClCompile Include="func.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="test_format.c">
+    <ClCompile Include="test_mail_format.c">
       <Filter>Исходные файлы\tests</Filter>
     </ClCompile>
     <ClCompile Include="test.c">
@@ -50,7 +50,7 @@
     <ClInclude Include="func.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="test_format.h">
+    <ClInclude Include="test_mail_format.h">
       <Filter>Исходные файлы\tests</Filter>
     </ClInclude>
     <ClInclude Include="test_email_address.h">

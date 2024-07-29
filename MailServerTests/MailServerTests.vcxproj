@@ -134,7 +134,7 @@
     <ClCompile Include="make.c" />
     <ClCompile Include="test.c" />
     <ClCompile Include="test_email_address.c" />
-    <ClCompile Include="test_format.c" />
+    <ClCompile Include="test_mail_format.c" />
     <ClCompile Include="test_list.c" />
     <ClCompile Include="test_smtp_request.c" />
   </ItemGroup>
@@ -149,7 +149,7 @@
     <ClInclude Include="make.h" />
     <ClInclude Include="test_smtp_request.h" />
     <ClInclude Include="test_email_address.h" />
-    <ClInclude Include="test_format.h" />
+    <ClInclude Include="test_mail_format.h" />
     <ClInclude Include="test_list.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

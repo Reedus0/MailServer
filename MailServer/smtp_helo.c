@@ -7,17 +7,19 @@
 #include "net.h"
 #include "buffer.h"
 #include "smtp_request.h"
+#include "validation.h"
+#include "server_session.h"
 
-enum STATUS serve_helo(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
+enum STATUS serve_helo(SOCKET sock, char* buffer, struct server_session* server_session) {
 	if (validate_with_args(buffer, "HELO ", " ") == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;
 	}
 
-	char* domain = get_value_from_buffer(buffer, " ");
-	domain = trim_string(domain);
+	char* hostname = get_value_from_buffer(buffer, " ");
+	hostname = trim_string(hostname);
 
-	smtp_request_set_domain(smtp_request, domain);
+	server_session_set_hostname(server_session, hostname);
 
 	send_response(sock, buffer, ACTION_OK);
 
