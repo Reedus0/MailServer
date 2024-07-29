@@ -1,7 +1,5 @@
-#include <stdio.h>
 #include <threads.h>
 #include <Winsock2.h>
-#include <ws2tcpip.h>
 #include "header.h"
 #include "server.h"
 #include "config.h"

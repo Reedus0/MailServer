@@ -8,7 +8,6 @@
 #include "buffer.h"
 #include "smtp_request.h"
 #include "validation.h"
-#include "server_session.h"
 
 static enum STATUS delete_dots(char* buffer) {
 	char* dot_pointer = strstr(buffer, "\r\n.", 3);

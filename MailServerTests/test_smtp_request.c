@@ -5,7 +5,7 @@
 #include "make.h"
 
 int test_add_multiple_recipients() {
-	struct smtp_request* smtp_request = make_smtp_request("", "john@domain.local", "john@domain.local", "Mail text\r\n");
+	struct smtp_request* smtp_request = make_smtp_request("host.domain.local", "john@domain.local", "john@domain.local", "Mail text\r\n");
 
 	smtp_request_add_recipient(smtp_request, string_to_email_address("carl@domain.local"));
 	smtp_request_add_recipient(smtp_request, string_to_email_address("ivan@domain.local"));

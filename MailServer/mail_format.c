@@ -49,7 +49,7 @@ static char* get_header_line(char* mait_text) {
 	return header_line;
 }
 
-static enum STATUS mail_parse_headers(struct mail* mail, char* mail_text) {
+enum STATUS mail_parse_headers(struct mail* mail, char* mail_text) {
 	char* char_pointer = strstr(mail_text, "\r\n");
 	char* end_of_headers = strstr(mail_text, "\r\n\r\n");
 	char* base_line = mail_text;
@@ -59,7 +59,7 @@ static enum STATUS mail_parse_headers(struct mail* mail, char* mail_text) {
 		if (current_line == NULL || *current_line == NULL) {
 			char* new_text = base_line;
 			mail_set_text(mail, new_text);
-			return STATUS_NOT_OK;
+			return STATUS_OK;
 		}
 
 		if (!add_single_header(mail, current_line)) {
@@ -87,7 +87,7 @@ static char* get_time_string() {
 	return time_string;
 }
 
-static enum STATUS mail_add_timestamp(struct mail* mail, struct email_address* mail_from) {
+enum STATUS mail_add_timestamp(struct mail* mail, struct email_address* mail_from) {
 	char* mail_from_string = email_address_to_string(mail_from);
 
 	char* time_string = get_time_string();
@@ -141,24 +141,19 @@ static char* get_received(char* hostname) {
 	return result;
 }
 
-static enum STATUS mail_add_server_headers(struct mail* mail, struct smtp_request* smtp_request) {
+enum STATUS mail_add_server_headers(struct mail* mail, struct smtp_request* smtp_request) {
 	char* mail_from_string = email_address_to_string(smtp_request->mail_from);
 	mail_add_header_if_not_exists(mail, "From", mail_from_string);
 	free(mail_from_string);
+
 	char* all_recipients = get_all_recipients(smtp_request);
 	mail_add_header_if_not_exists(mail, "To", all_recipients);
 	mail_add_header(mail, "X-Original-To", all_recipients);
 	free(all_recipients);
+
 	char* received = get_received(smtp_request->hostname);
 	mail_add_header(mail, "Received", received);
 	free(received);
-	return STATUS_OK;
-}
-
-int format_mail(struct mail* mail, struct smtp_request* smtp_request) {
-	mail_parse_headers(mail, smtp_request->data);
-	mail_add_timestamp(mail, smtp_request->mail_from);
-	mail_add_server_headers(mail, smtp_request);
 
 	return STATUS_OK;
 }

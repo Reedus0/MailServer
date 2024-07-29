@@ -38,7 +38,9 @@ static enum STATUS deliver_mail(struct mail* mail, struct smtp_request_recipient
 void process_smtp_request(struct smtp_request* smtp_request) {
 	struct mail* mail = init_mail();
 
-	format_mail(mail, smtp_request);
+	mail_add_timestamp(mail, smtp_request->mail_from);
+	mail_parse_headers(mail, smtp_request->data);
+	mail_add_server_headers(mail, smtp_request);
 	
 	struct smtp_request_recipient* last_recipient = smtp_request->rcpt_to_list;
 	while (1) {
