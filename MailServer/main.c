@@ -10,12 +10,12 @@ int main(int argv, char* argc[]) {
     thrd_t new_thread;
     WSADATA wsa_data;
 
-    config_parse_file("config.txt");
-
     int status = WSAStartup(MAKEWORD(2, 2), &wsa_data);
     if (status != 0) {
         return 1;
     }
+
+    config_parse_file("E:/config.txt");
 
     int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 

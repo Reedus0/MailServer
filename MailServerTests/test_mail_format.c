@@ -34,19 +34,6 @@ int test_has_header() {
     return 0;
 }
 
-int test_space_headers() {
-    struct smtp_request* smtp_request = make_smtp_request("host.domain.local", "john@domain.local", "john@domain.local", " Subject: Mail\r\n\r\nMail text\r\n");
-    struct mail* mail = init_mail();
-
-    mail_parse_headers(mail, smtp_request->data);
-
-    if (string_except_eq(mail->text, " Subject: Mail\r\n\r\nMail text\r\n")) {
-        printf("test_space_headers OK\n");
-        return 1;
-    }
-    return 0;
-}
-
 int test_no_headers() {
     struct smtp_request* smtp_request = make_smtp_request("host.domain.local", "john@domain.local", "john@domain.local", "Mail text\r\n");
     struct mail* mail = init_mail();

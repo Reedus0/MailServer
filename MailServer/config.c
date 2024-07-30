@@ -2,15 +2,108 @@
 #include <string.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <WinSock2.h>
 #include "config.h"
 #include "buffer.h"
+#include "header.h"
+
+static struct user* init_user() {
+	struct user* new_user = calloc(1, sizeof(struct user));
+
+	new_user->username = NULL;
+	new_user->list = init_list();
+
+	return new_user;
+}
+
+static enum STATUS clean_user(struct user* user) {
+	free(user->username);
+
+	free(user);
+
+	return STATUS_OK;
+}
+
+static void throw_config_error(char* error) {
+	printf("Error parsing config: %s", error);
+	exit(1);
+}
+
+static char* read_config_file(char* filename) {
+	char* buffer = calloc(MAX_CONFIG_SIZE, sizeof(char));
+
+	FILE* file_ptr = fopen(filename, "r");
+	if (file_ptr == NULL) {
+		throw_config_error("No config file");
+	}
+
+	while (fgets(buffer + strlen(buffer), CONFIG_MAX_LINE_SIZE, file_ptr));
+
+	fclose(file_ptr);
+
+	return buffer;
+}
+
+static char* get_config_param(char* config, char* param) {
+	char* current_line;
+	char* iterator = config;
+
+	while (iterator != NULL) {
+		current_line = buffer_get_next(&iterator, "\n");
+		char* line_param = trim_string(get_field_from_buffer(current_line, "="));
+
+		if (compare_strings(line_param, param)) {
+			char* result = trim_string(get_value_from_buffer(current_line, "="));
+			free(current_line);
+			free(line_param);
+			return result;
+		}
+
+		free(current_line);
+		free(line_param);
+	}
+
+	return NULL;
+}
+
+static struct user* get_config_users(char* config) {
+	char* config_users = get_config_param(config, "users");
+
+	char* iterator = config_users;
+
+	struct user* last_user = init_user();
+	last_user->username = buffer_get_next(&iterator, ",");
+
+	while (iterator != NULL) {
+		char* current_user = buffer_get_next(&iterator, ",");
+
+		struct user* new_user = init_user();
+		new_user->username = current_user;
+
+		list_insert(&last_user->list, &new_user->list);
+		last_user = new_user;
+	}
+
+	return last_user;
+}
+
+static char* get_config_hostname() {
+	char* hostname = calloc(256, sizeof(char)); // Max hostname length is 255
+	int status = gethostname(hostname, 256);
+	if (status == -1) {
+		throw_config_error("Couldn't get hostname");
+	}
+	return hostname;
+}
 
 void config_parse_file(char* filename) {
-	config.domain = "domain.local";
-	config.mail_path = "E:/";
-	config.listen_port = 1025;
-	config.users = "john";
-	config.hostname = "server";
+	char* buffer = read_config_file(filename);
+
+	config.domain = get_config_param(buffer, "domain");
+	config.mail_path = get_config_param(buffer, "mail_path");
+	config.listen_port = get_config_param(buffer, "listen_port");
+	config.users_list = get_config_users(buffer);
+	config.hostname = get_config_hostname();
 }
 
 char* config_get_domain() {
@@ -21,12 +114,12 @@ char* config_get_mail_path() {
 	return config.mail_path;
 }
 
-char* config_get_users() {
-	return config.users;
+int config_get_listen_port() {
+	return atoi(config.listen_port);
 }
 
-char* config_get_listen_port() {
-	return config.listen_port;
+struct user* config_get_users() {
+	return config.users_list;
 }
 
 char* config_get_hostname() {

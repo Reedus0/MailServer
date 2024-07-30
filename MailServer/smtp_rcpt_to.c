@@ -11,29 +11,32 @@
 #include "config.h"
 #include "validation.h"
 
-static enum STATUS check_domain(char* domain, char* server_domain) {
+static enum STATUS check_domain(char* domain) {
+	char* server_domain = config_get_domain();
 	return !memcmp(domain, server_domain, strlen(server_domain));
 }
 
-static enum STATUS check_user(char* user, char* server_user) {
-	if (strlen(server_user) != strlen(user)) {
-		return STATUS_NOT_OK;
-	}
-	if (!memcmp(user, server_user, strlen(server_user))) {
-		return STATUS_OK;
+static enum STATUS check_user(char* user) {
+	struct user* current_user = config_get_users();
+	while (1) {
+		if (compare_strings(current_user->username, user)) {
+			return STATUS_OK;
+		}
+		if (current_user->list.prev == NULL) {
+			break;
+		}
+		current_user = list_parent(current_user->list.prev, struct user, list);
 	}
 	return STATUS_NOT_OK;
 }
 
 static enum STATUS validate_user(struct email_address* user) {
-	char* server_domain = config_get_domain();
-	char* server_users = config_get_users();
 
-	if (!check_domain(user->domain, server_domain)) {
+	if (!check_domain(user->domain)) {
 		return STATUS_NOT_OK;
 	}
 
-	if (!check_user(user->user, server_users)) {
+	if (!check_user(user->user)) {
 		return STATUS_NOT_OK;
 	}
 
@@ -41,7 +44,7 @@ static enum STATUS validate_user(struct email_address* user) {
 }
 
 enum STATUS serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
-	if (validate_with_args(buffer, "RCPT TO:", ":") == STATUS_NOT_OK) {
+	if (validate_with_args(buffer, "rcpt to:", ":") == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;
 	}

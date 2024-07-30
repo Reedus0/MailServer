@@ -31,10 +31,10 @@ enum STATUS smtp_request_set_session(struct smtp_request* smtp_request, struct s
 	return STATUS_OK;
 }
 
-enum STATUS smtp_request_add_recipient(struct smtp_request* smtp_request, struct email_address* recipient) {
+enum STATUS smtp_request_add_recipient(struct smtp_request* smtp_request, struct email_address* email_address) {
 	struct smtp_request_recipient* new_smtp_request_recipient = init_smtp_request_recipient();
 
-	new_smtp_request_recipient->email_address = recipient;
+	new_smtp_request_recipient->email_address = email_address;
 
 	if (smtp_request->rcpt_to_list == NULL) {
 		smtp_request->rcpt_to_list = new_smtp_request_recipient;

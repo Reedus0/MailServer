@@ -23,7 +23,7 @@ static enum STATUS initialize_session(struct smtp_request** smtp_request, struct
 }
 
 static enum STATUS serve_quit(SOCKET sock, char* buffer) {
-	if (validate_without_args(buffer, "QUIT") == STATUS_NOT_OK) {
+	if (validate_without_args(buffer, "quit") == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;
 	}
@@ -33,7 +33,7 @@ static enum STATUS serve_quit(SOCKET sock, char* buffer) {
 }
 
 static enum STATUS serve_noop(SOCKET sock, char* buffer) {
-	if (validate_without_args(buffer, "NOOP") == STATUS_NOT_OK) {
+	if (validate_without_args(buffer, "noop") == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;
 	}
@@ -43,7 +43,7 @@ static enum STATUS serve_noop(SOCKET sock, char* buffer) {
 }
 
 static enum STATUS serve_rset(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
-	if (validate_without_args(buffer, "RSET") == STATUS_NOT_OK) {
+	if (validate_without_args(buffer, "rset") == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;
 	}
@@ -67,17 +67,19 @@ void serve_connection(SOCKET sock) {
 		status = get_message(sock, buffer);
 		if (status == STATUS_ERROR) break;
 
-		if (buffer_has_command("QUIT", buffer)) {
+		lower_buffer(buffer);
+
+		if (buffer_has_command("quit", buffer)) {
 			serve_quit(sock, buffer);
 			break;
 		}
 
-		if (buffer_has_command("NOOP", buffer)) {
+		if (buffer_has_command("noop", buffer)) {
 			serve_noop(sock, buffer, smtp_request);
 			continue;
 		}
 
-		if (buffer_has_command("RSET", buffer)) {
+		if (buffer_has_command("rset", buffer)) {
 			status = serve_rset(sock, buffer, smtp_request);
 			if (status == STATUS_OK) {
 				initialize_session(&smtp_request, server_session);
@@ -85,7 +87,7 @@ void serve_connection(SOCKET sock) {
 			continue;
 		}
 
-		if (buffer_has_command("HELO ", buffer)) {
+		if (buffer_has_command("helo ", buffer)) {
 			status = serve_helo(sock, buffer, server_session);
 			if (status == STATUS_OK) {
 				initialize_session(&smtp_request, server_session);
@@ -93,7 +95,7 @@ void serve_connection(SOCKET sock) {
 			continue;
 		}
 
-		if (buffer_has_command("MAIL FROM:", buffer)) {
+		if (buffer_has_command("mail from:", buffer)) {
 			if (!server_session_validate_state(server_session, INITIALIZED)) {
 				send_response(sock, buffer, BAD_SEQUENCE);
 				continue;
@@ -105,7 +107,7 @@ void serve_connection(SOCKET sock) {
 			continue;
 		}
 
-		if (buffer_has_command("RCPT TO:", buffer)) {
+		if (buffer_has_command("rcpt to:", buffer)) {
 			if (!server_session_validate_state(server_session, HAS_MAIL_FROM)) {
 				send_response(sock, buffer, BAD_SEQUENCE);
 				continue;
@@ -118,7 +120,7 @@ void serve_connection(SOCKET sock) {
 			continue;
 		}
 
-		if (buffer_has_command("DATA", buffer)) {
+		if (buffer_has_command("data", buffer)) {
 			if (!server_session_validate_state(server_session, HAS_RCPT_TO)) {
 				send_response(sock, buffer, BAD_SEQUENCE);
 				continue;

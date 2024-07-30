@@ -24,56 +24,39 @@ static enum STATUS add_single_header(struct mail* mail, char* header_line) {
 	return STATUS_OK;
 }
 
-static char* get_header_line(char* mait_text) {
-	char* start_of_line = mait_text;
-	char* end_of_line = strstr(mait_text, "\r\n");
-	char* separator = strchr(mait_text, ':');
+enum STATUS validate_header_line(char* line) {
+	char* separator = strstr(line, ":");
 
-	if (*start_of_line == ' ') {
-		return NULL;
-	}
+	if (separator == NULL) return STATUS_NOT_OK;
 
-	if (separator == NULL) {
-		return NULL;
-	}
-
-	if (separator > end_of_line) {
-		return NULL;
-	}
-
-	int header_line_length = end_of_line - mait_text;
-
-	char* header_line = calloc(header_line_length + 1, sizeof(char));
-	memcpy(header_line, mait_text, header_line_length);
-
-	return header_line;
+	return STATUS_OK;
 }
 
 enum STATUS mail_parse_headers(struct mail* mail, char* mail_text) {
-	char* char_pointer = strstr(mail_text, "\r\n");
-	char* end_of_headers = strstr(mail_text, "\r\n\r\n");
-	char* base_line = mail_text;
-	while (base_line != end_of_headers + strlen("\r\n")) {
-		char* current_line = get_header_line(base_line);
+	char* iterator = mail_text;
+	char* current_line;
 
-		if (current_line == NULL || *current_line == NULL) {
-			char* new_text = base_line;
-			mail_set_text(mail, new_text);
+	char* end_of_headers = strstr(mail_text, "\r\n\r\n");
+
+	while (iterator != end_of_headers + strlen("\r\n")) {
+		if (is_empty_string(iterator)) {
+			mail_set_text(mail, iterator);
 			return STATUS_OK;
 		}
 
-		if (!add_single_header(mail, current_line)) {
-			return STATUS_NOT_OK;
+		current_line = buffer_get_next(&iterator, "\r\n");
+		if (validate_header_line(current_line) == STATUS_NOT_OK) {
+			mail_set_text(mail, iterator - strlen(current_line) - strlen("\r\n"));
+			free(current_line);
+			return STATUS_OK;
 		}
-		
-		free(current_line);
 
-		base_line = char_pointer + strlen("\r\n");
-		char_pointer = strstr(base_line, "\r\n");
+		add_single_header(mail, current_line);
+		free(current_line);
 	}
 
-	char* new_text = end_of_headers + strlen("\r\n\r\n");
-	mail_set_text(mail, new_text);
+	iterator = iterator + strlen("\r\n");
+	mail_set_text(mail, iterator);
 
 	return STATUS_OK;
 }

@@ -16,6 +16,14 @@ void flush_to_buffer(char* buffer, int size, char* format, ...) {
 	va_end(va);
 }
 
+void lower_buffer(char* string) {
+	while (*string != '\0') {
+		*string = tolower(*string);
+		string++;
+	}
+	return string;
+}
+
 char* copy_buffer(char* buffer) {
 	char* result = calloc(strlen(buffer) + 1, sizeof(char));
 	memcpy(result, buffer, strlen(buffer));
@@ -57,6 +65,28 @@ char* get_value_from_buffer(char* message, char* separator) {
 	int new_length = strlen(separator_pointer);
 	char* result = calloc(new_length + 1, sizeof(char));
 	memcpy(result, separator_pointer, new_length);
+	return result;
+}
+
+char* buffer_get_next(char** iterator, char* separator) {
+	char* start_of_line = *iterator;
+	char* end_of_line = strstr(*iterator, separator);
+
+	int result_length = end_of_line - *iterator;
+
+	if (end_of_line == NULL) {
+		result_length = strlen(*iterator);
+	}
+
+	char* result = calloc(result_length + 1, sizeof(char));
+	memcpy(result, *iterator, result_length);
+ 	result = trim_string(result);
+	*iterator = end_of_line + strlen(separator);
+
+	if (end_of_line == NULL) {
+		*iterator = NULL;
+	}
+	
 	return result;
 }
 

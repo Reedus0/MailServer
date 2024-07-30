@@ -46,7 +46,7 @@ static char* get_smtp_data(SOCKET sock, char* buffer) {
 }
 
 enum STATUS serve_data(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
-	if (validate_without_args(buffer, "DATA") == STATUS_NOT_OK) {
+	if (validate_without_args(buffer, "data") == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;
 	}

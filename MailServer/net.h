@@ -2,7 +2,7 @@
 
 #include <WinSock2.h>
 
-#define BUFFER_SIZE 128
+#define BUFFER_SIZE 512
 
 char* init_buffer();
 void clear_buffer(char* buffer);

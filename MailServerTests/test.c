@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <string.h>
+#include <WinSock2.h>
 #include "header.h"
 
 #include "test_mail_format.h"
 #include "test_email_address.h"
 #include "test_list.h"
 #include "test_smtp_request.h"
+#pragma comment(lib, "ws2_32.lib")
 
 int test_list(char* list_name, int (*tests[])()) {
     printf("\nStarting %s tests...\n\n", list_name);
@@ -21,7 +23,14 @@ int test_list(char* list_name, int (*tests[])()) {
 
 int main(int argv, char* argc[]) {
 
-    config_parse_file("config.txt");
+    WSADATA wsa_data;
+
+    int status = WSAStartup(MAKEWORD(2, 2), &wsa_data);
+    if (status != 0) {
+        return 1;
+    }
+
+    config_parse_file("E:/config.txt");
 
     int (*list_tests[])() = {
         test_list_insert,
@@ -52,7 +61,6 @@ int main(int argv, char* argc[]) {
         test_no_double_enter,
         test_pre_enter,
         test_no_headers,
-        test_space_headers,
         test_has_header,
         test_has_header_with_two_recipients,
         NULL

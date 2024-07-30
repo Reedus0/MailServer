@@ -10,7 +10,7 @@
 #include "validation.h"
 
 enum STATUS serve_mail_from(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
-	if (validate_with_args(buffer, "MAIL FROM:", ":") == STATUS_NOT_OK) {
+	if (validate_with_args(buffer, "mail from:", ":") == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;
 	}

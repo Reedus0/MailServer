@@ -11,7 +11,7 @@
 #include "server_session.h"
 
 enum STATUS serve_helo(SOCKET sock, char* buffer, struct server_session* server_session) {
-	if (validate_with_args(buffer, "HELO ", " ") == STATUS_NOT_OK) {
+	if (validate_with_args(buffer, "helo ", " ") == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;
 	}
