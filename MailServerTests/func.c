@@ -1,4 +1,5 @@
 #include <string.h>
+#include "status.h"
 
 #define MAX(a,b) (a > b ? a : b)
 #define MIN(a,b) (a > b ? b : a)
@@ -25,4 +26,12 @@ int ptr_except_eq(void* first, void* second) {
 
 int ptr_except_not_eq(void* first, void* second) {
 	return !ptr_except_eq(first, second);
+}
+
+int status_except_ok(enum STATUS first) {
+	return first == STATUS_OK;
+}
+
+int status_except_not_ok(enum STATUS first) {
+	return first == STATUS_NOT_OK;
 }

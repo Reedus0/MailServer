@@ -1,8 +1,9 @@
 #include <threads.h>
 #include <Winsock2.h>
-#include "header.h"
+#include "status.h"
 #include "server.h"
 #include "config.h"
+#include "main.h"
 #pragma comment(lib, "ws2_32.lib")
 
 int main(int argv, char* argc[]) {
@@ -10,13 +11,13 @@ int main(int argv, char* argc[]) {
     thrd_t new_thread;
     WSADATA wsa_data;
 
-    int status = WSAStartup(MAKEWORD(2, 2), &wsa_data);
-    if (status != 0) {
+    if (argv < 2) {
+        printf("Usage: %s config_file_path", argc[0]);
         return 1;
     }
 
-    if (argv < 2) {
-        printf("Usage: %s config_file_path", argc[0]);
+    int status = WSAStartup(MAKEWORD(2, 2), &wsa_data);
+    if (status != 0) {
         return 1;
     }
 

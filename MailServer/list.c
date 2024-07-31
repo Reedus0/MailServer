@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "malloc.h"
 #include "list.h"
-#include "header.h"
+#include "status.h"
 
 struct list init_list() {
 	struct list new_list;

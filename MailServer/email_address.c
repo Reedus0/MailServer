@@ -3,7 +3,7 @@
 #include <malloc.h>
 #include "buffer.h"
 #include "email_address.h"
-#include "header.h"
+#include "status.h"
 
 struct email_address* init_email_address() {
 	struct email_address* new_email_address = calloc(1, sizeof(struct email_address));
@@ -11,6 +11,24 @@ struct email_address* init_email_address() {
 	new_email_address->domain = NULL;
 
 	return new_email_address;
+}
+
+enum STATUS email_address_set_user(struct email_address* email_address, char* user) {
+	email_address->user = user;
+	return STATUS_OK;
+}
+
+enum STATUS email_address_set_domain(struct email_address* email_address, char* domain) {
+	email_address->domain = domain;
+	return STATUS_OK;
+}
+
+enum STATUS clean_email_address(struct email_address* email_address) {
+	free(email_address->user);
+	free(email_address->domain);
+
+	free(email_address);
+	return STATUS_OK;
 }
 
 enum STATUS validate_email_string(char* string) {
@@ -58,27 +76,9 @@ char* email_address_to_string(struct email_address* email_address) {
 	int user_length = strlen(email_address->user);
 	int domain_length = strlen(email_address->domain);
 
-	char* result = calloc(user_length + domain_length + 3, sizeof(char));
+	char* result = calloc(user_length + domain_length + 2, sizeof(char));
 
 	flush_to_buffer(result, 2, "%s@%s", email_address->user, email_address->domain);
 
 	return result;
-}
-
-enum STATUS email_address_set_user(struct email_address* email_address, char* user) {
-	email_address->user = user;
-	return STATUS_OK;
-}
-
-enum STATUS email_address_set_domain(struct email_address* email_address, char* domain) {
-	email_address->domain = domain;
-	return STATUS_OK;
-}
-
-enum STATUS clean_email_address(struct email_address* email_address) {
-	free(email_address->user);
-	free(email_address->domain);
-
-	free(email_address);
-	return STATUS_OK;
 }

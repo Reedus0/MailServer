@@ -6,14 +6,15 @@
 #include "smtp_request.h"
 #include "buffer.h"
 #include "config.h"
-#include "header.h"
+#include "status.h"
 #include "mail_format.h"
+#include "server_session.h"
 
 static enum STATUS add_single_header(struct mail* mail, char* header_line) {
 
 	char* new_name = get_field_from_buffer(header_line, ":");
-	new_name = trim_string(new_name);
 	char* new_value = get_value_from_buffer(header_line, ":");
+	new_name = trim_string(new_name);
 	new_value = trim_string(new_value);
 
 	mail_add_header(mail, new_name, new_value);
@@ -106,6 +107,20 @@ static char* get_all_recipients(struct smtp_request* smtp_request) {
 	return result;
 }
 
+enum STATUS mail_add_server_headers(struct mail* mail, struct smtp_request* smtp_request) {
+	char* mail_from_string = email_address_to_string(smtp_request->mail_from);
+	mail_add_header_if_not_exists(mail, "From", mail_from_string);
+	mail_replace_header(mail, "Return-Path", mail_from_string);
+	free(mail_from_string);
+
+	char* all_recipients = get_all_recipients(smtp_request);
+	mail_add_header_if_not_exists(mail, "To", all_recipients);
+	mail_replace_header(mail, "X-Original-To", all_recipients);
+	free(all_recipients);
+
+	return STATUS_OK;
+}
+
 static char* get_received(char* hostname) {
 	char* result = calloc(DEFAULT_HEADER_SIZE, sizeof(char));
 
@@ -118,17 +133,8 @@ static char* get_received(char* hostname) {
 	return result;
 }
 
-enum STATUS mail_add_server_headers(struct mail* mail, struct smtp_request* smtp_request) {
-	char* mail_from_string = email_address_to_string(smtp_request->mail_from);
-	mail_add_header_if_not_exists(mail, "From", mail_from_string);
-	free(mail_from_string);
-
-	char* all_recipients = get_all_recipients(smtp_request);
-	mail_add_header_if_not_exists(mail, "To", all_recipients);
-	mail_add_header(mail, "X-Original-To", all_recipients);
-	free(all_recipients);
-
-	char* received = get_received(smtp_request->hostname);
+enum STATUS mail_add_session_headers(struct mail* mail, struct server_session* server_session) {
+	char* received = get_received(server_session->hostname);
 	mail_add_header(mail, "Received", received);
 	free(received);
 

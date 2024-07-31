@@ -2,15 +2,7 @@
 #include <malloc.h>
 #include "mail.h"
 #include "buffer.h"
-#include "header.h"
-
-static struct mail_header* init_mail_header() {
-	struct mail_header* new_mail_header = calloc(1, sizeof(struct mail_header));
-	new_mail_header->name = NULL;
-	new_mail_header->value = NULL;
-
-	return new_mail_header;
-}
+#include "status.h"
 
 struct mail* init_mail() {
 	struct mail* new_mail = calloc(1, sizeof(struct mail));
@@ -19,6 +11,14 @@ struct mail* init_mail() {
 	new_mail->headers_list = NULL;
 
 	return new_mail;
+}
+
+static struct mail_header* init_mail_header() {
+	struct mail_header* new_mail_header = calloc(1, sizeof(struct mail_header));
+	new_mail_header->name = NULL;
+	new_mail_header->value = NULL;
+
+	return new_mail_header;
 }
 
 enum STATUS mail_add_header(struct mail* mail, char* name, char* value) {
@@ -40,14 +40,14 @@ enum STATUS mail_add_header(struct mail* mail, char* name, char* value) {
 	return STATUS_OK;
 }
 
-char* mail_get_header_value(struct mail* mail, char* name) {
+static struct mail_header* mail_get_header(struct mail* mail, char* name) {
 	struct mail_header* current_header = mail->headers_list;
 	if (current_header == NULL) {
 		return STATUS_NOT_OK;
 	}
 	while (1) {
 		if (compare_strings(current_header->name, name)) {
-			return current_header->value;
+			return current_header;
 		}
 		if (current_header->list.prev == NULL) {
 			break;
@@ -57,17 +57,53 @@ char* mail_get_header_value(struct mail* mail, char* name) {
 	return NULL;
 }
 
+char* mail_get_header_value(struct mail* mail, char* name) {
+	struct mail_header* mail_header = mail_get_header(mail, name);
+
+	if (mail_header == NULL) {
+		return NULL;
+	}
+
+	return mail_header->value;
+}
+
 enum STATUS mail_has_header(struct mail* mail, char* name) {
-	if (mail_get_header_value(mail, name) == NULL) {
+	struct mail_header* mail_header = mail_get_header(mail, name);
+
+	if (mail_header == NULL) {
 		return STATUS_NOT_OK;
 	}
+
 	return STATUS_OK;
 }
 
 enum STATUS mail_add_header_if_not_exists(struct mail* mail, char* name, char* value) {
-	if (!mail_has_header(mail, name)) {
+	if (mail_has_header(mail, name) == STATUS_NOT_OK) {
 		mail_add_header(mail, name, value);
 	}
+
+	return STATUS_OK;
+}
+
+enum STATUS mail_remove_header(struct mail* mail, char* name) {
+	struct mail_header* mail_header = mail_get_header(mail, name);
+
+	if (mail_header == NULL) {
+		return STATUS_NOT_OK;
+	}
+
+	list_remove(&mail_header->list);
+	clean_mail_header(mail_header);
+
+	return STATUS_OK;
+}
+
+enum STATUS mail_replace_header(struct mail* mail, char* name, char* value) {
+	if (mail_has_header(mail, name) == STATUS_OK) {
+		mail_remove_header(mail, name);
+	}
+	mail_add_header(mail, name, value);
+	
 	return STATUS_OK;
 }
 
@@ -105,6 +141,7 @@ static enum STATUS clean_mail_header(struct mail_header* mail_header) {
 	free(mail_header->value);
 
 	free(mail_header);
+
 	return STATUS_OK;
 }
 
@@ -128,5 +165,6 @@ enum STATUS clean_mail(struct mail* mail) {
 	free(mail->timestamp);
 
 	free(mail);
+
 	return STATUS_OK;
 }

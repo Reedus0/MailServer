@@ -2,7 +2,7 @@
 #include <WinSock2.h>
 #include "smtp_data.h"
 #include "codes.h"
-#include "header.h"
+#include "status.h"
 #include "server.h"
 #include "net.h"
 #include "buffer.h"

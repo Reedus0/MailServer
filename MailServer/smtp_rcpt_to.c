@@ -3,7 +3,7 @@
 #include "smtp_data.h"
 #include "email_address.h"
 #include "codes.h"
-#include "header.h"
+#include "status.h"
 #include "server.h"
 #include "net.h"
 #include "buffer.h"
@@ -54,6 +54,7 @@ enum STATUS serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_r
 
 	if (validate_email_string(rcpt_to) == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
+		free(rcpt_to);
 		return STATUS_NOT_OK;
 	}
 

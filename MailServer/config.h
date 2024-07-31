@@ -2,7 +2,6 @@
 
 #include "list.h"
 
-#define MAX_USERS 16
 #define MAX_CONFIG_SIZE 8192
 #define CONFIG_MAX_LINE_SIZE 255
 
@@ -19,6 +18,7 @@ struct config {
 	char* hostname;
 } config;
 
+void config_parse_buffer(char* buffer);
 void config_parse_file(char* filename);
 char* config_get_domain();
 char* config_get_mail_path();

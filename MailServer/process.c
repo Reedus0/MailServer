@@ -7,14 +7,15 @@
 #include "mail_format.h"
 #include "buffer.h"
 #include "config.h"
-#include "header.h"
+#include "status.h"
+#include "server_session.h"
 
 static enum STATUS write_mail_to_file(char* recipient, char* buffer) {
 	char* mail_path = config_get_mail_path();
 
 	int mail_path_length = strlen(mail_path);
 	int recipient_length = strlen(recipient);
-	char* full_path = calloc(mail_path_length + recipient_length + 3, sizeof(char));
+	char* full_path = calloc(mail_path_length + recipient_length + 2, sizeof(char));
 	flush_to_buffer(full_path, 2, "%s/%s", mail_path, recipient);
 
 	FILE* file_ptr = fopen(full_path, "ab");
@@ -35,12 +36,13 @@ static enum STATUS deliver_mail(struct mail* mail, struct smtp_request_recipient
 	free(final_text);
 }
 
-void process_smtp_request(struct smtp_request* smtp_request) {
+void process_smtp_request(struct smtp_request* smtp_request, struct server_session* server_session) {
 	struct mail* mail = init_mail();
 
 	mail_add_timestamp(mail, smtp_request->mail_from);
 	mail_parse_headers(mail, smtp_request->data);
 	mail_add_server_headers(mail, smtp_request);
+	mail_add_session_headers(mail, server_session);
 	
 	struct smtp_request_recipient* last_recipient = smtp_request->rcpt_to_list;
 	while (1) {

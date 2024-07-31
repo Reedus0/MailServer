@@ -1,12 +1,11 @@
 #include <Winsock2.h>
-#include "header.h"
+#include "status.h"
 #include "buffer.h"
 #include "codes.h"
 #include "smtp_request.h"
 #include "server.h"
 #include "net.h"
 #include "server_session.h"
-#include "validation.h"
 #include "process.h"
 
 #include "smtp_data.h"
@@ -17,18 +16,30 @@
 #include "smtp_noop.h"
 #include "smtp_rset.h"
 
-static enum STATUS initialize_session(struct smtp_request** smtp_request, struct server_session* server_session) {
+static enum STATUS set_state(enum SERVER_STATE* current_state, enum SERVER_STATE state) {
+	*current_state = state;
+	return STATUS_OK;
+}
+
+static enum STATUS validate_state(enum SERVER_STATE current_state, enum SERVER_STATE state) {
+	if (current_state < state) {
+		return STATUS_NOT_OK;
+	}
+	return STATUS_OK;
+}
+
+static enum STATUS initialize_session(struct smtp_request** smtp_request, enum SERVER_STATE* current_state) {
 	clean_smtp_request(*smtp_request);
 	*smtp_request = init_smtp_request();
-	smtp_request_set_session(*smtp_request, server_session);
-	server_session_set_state(server_session, INITIALIZED);
+	set_state(current_state, INITIALIZED);
 	return STATUS_OK;
 }
 
 void serve_connection(SOCKET sock) {
 	int status = 0;
+	enum SERVER_STATE current_state = DEFAULT;
 
-	char* buffer = init_buffer();
+	char* buffer = init_socket_buffer();
 
 	send_response(sock, buffer, SERVICE_READY);
 
@@ -48,14 +59,14 @@ void serve_connection(SOCKET sock) {
 		}
 
 		if (buffer_has_command("noop", buffer)) {
-			serve_noop(sock, buffer, smtp_request);
+			serve_noop(sock, buffer);
 			continue;
 		}
 
 		if (buffer_has_command("rset", buffer)) {
-			status = serve_rset(sock, buffer, smtp_request);
+			status = serve_rset(sock, buffer);
 			if (status == STATUS_OK) {
-				initialize_session(&smtp_request, server_session);
+				initialize_session(&smtp_request, &current_state);
 			}
 			continue;
 		}
@@ -63,47 +74,47 @@ void serve_connection(SOCKET sock) {
 		if (buffer_has_command("helo ", buffer)) {
 			status = serve_helo(sock, buffer, server_session);
 			if (status == STATUS_OK) {
-				initialize_session(&smtp_request, server_session);
+				initialize_session(&smtp_request, &current_state);
 			}
 			continue;
 		}
 
 		if (buffer_has_command("mail from:", buffer)) {
-			if (!server_session_validate_state(server_session, INITIALIZED)) {
+			if (!validate_state(current_state, INITIALIZED)) {
 				send_response(sock, buffer, BAD_SEQUENCE);
 				continue;
 			}
 			status = serve_mail_from(sock, buffer, smtp_request);
 			if (status == STATUS_OK) { 
-				server_session_set_state(server_session, HAS_MAIL_FROM);
+				set_state(&current_state, HAS_MAIL_FROM);
 			}
 			continue;
 		}
 
 		if (buffer_has_command("rcpt to:", buffer)) {
-			if (!server_session_validate_state(server_session, HAS_MAIL_FROM)) {
+			if (!validate_state(current_state, HAS_MAIL_FROM)) {
 				send_response(sock, buffer, BAD_SEQUENCE);
 				continue;
 			}
 
 			status = serve_rcpt_to(sock, buffer, smtp_request);
 			if (status == STATUS_OK) {
-				server_session_set_state(server_session, HAS_RCPT_TO);
+				set_state(&current_state, HAS_RCPT_TO);
 			}
 			continue;
 		}
 
 		if (buffer_has_command("data", buffer)) {
-			if (!server_session_validate_state(server_session, HAS_RCPT_TO)) {
+			if (!validate_state(current_state, HAS_RCPT_TO)) {
 				send_response(sock, buffer, BAD_SEQUENCE);
 				continue;
 			}
 
 			status = serve_data(sock, buffer, smtp_request);
 			if (status == STATUS_OK) {
-				process_smtp_request(smtp_request);
+				process_smtp_request(smtp_request, server_session);
 
-				initialize_session(&smtp_request, server_session);
+				initialize_session(&smtp_request, &current_state);
 			}
 			continue;
 		}
@@ -113,5 +124,5 @@ void serve_connection(SOCKET sock) {
 	clean_smtp_request(smtp_request);
 	clean_server_session(server_session);
 	socket_cleanup(sock);
-	clean_buffer(buffer);
+	clean_socket_buffer(buffer);
 }

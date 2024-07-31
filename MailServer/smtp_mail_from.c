@@ -1,7 +1,7 @@
 #include <string.h>
 #include <WinSock2.h>
 #include "smtp_data.h"
-#include "header.h"
+#include "status.h"
 #include "codes.h"
 #include "net.h"
 #include "server.h"
@@ -20,6 +20,7 @@ enum STATUS serve_mail_from(SOCKET sock, char* buffer, struct smtp_request* smtp
 
 	if (validate_email_string(mail_from) == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
+		free(mail_from);
 		return STATUS_NOT_OK;
 	}
 

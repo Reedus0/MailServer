@@ -153,9 +153,10 @@
   <ItemGroup>
     <ClInclude Include="codes.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="main.h" />
     <ClInclude Include="process.h" />
     <ClInclude Include="email_address.h" />
-    <ClInclude Include="header.h" />
+    <ClInclude Include="status.h" />
     <ClInclude Include="list.h" />
     <ClInclude Include="mail.h" />
     <ClInclude Include="buffer.h" />

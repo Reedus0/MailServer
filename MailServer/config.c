@@ -5,7 +5,7 @@
 #include <WinSock2.h>
 #include "config.h"
 #include "buffer.h"
-#include "header.h"
+#include "status.h"
 
 static struct user* init_user() {
 	struct user* new_user = calloc(1, sizeof(struct user));
@@ -39,12 +39,18 @@ static char* read_config_file(char* filename) {
 
 	while (fgets(buffer + strlen(buffer), CONFIG_MAX_LINE_SIZE, file_ptr));
 
+	char* last_symbol = (buffer + strlen(buffer) - 1);
+	while (*last_symbol == '\n') {
+		*last_symbol = '\0';
+		last_symbol -= 1;
+	}
+
 	fclose(file_ptr);
 
 	return buffer;
 }
 
-static char* get_config_param(char* config, char* param) {
+static char* get_config_param(char* config, char* param, char* default_param) {
 	char* current_line;
 	char* iterator = config;
 
@@ -63,11 +69,11 @@ static char* get_config_param(char* config, char* param) {
 		free(line_param);
 	}
 
-	return NULL;
+	return default_param;
 }
 
-static struct user* get_config_users(char* config) {
-	char* config_users = get_config_param(config, "users");
+static struct user* get_config_users(char* config, char* default_param) {
+	char* config_users = get_config_param(config, "users", default_param);
 
 	char* iterator = config_users;
 
@@ -93,17 +99,24 @@ static char* get_config_hostname() {
 	if (status == -1) {
 		throw_config_error("Couldn't get hostname");
 	}
+	lower_buffer(hostname);
 	return hostname;
+}
+
+void config_parse_buffer(char* buffer) {
+	config.domain = get_config_param(buffer, "domain", "domain.local");
+	config.mail_path = get_config_param(buffer, "mail_path", "./");
+	config.listen_port = get_config_param(buffer, "listen_port", "25");
+	config.users_list = get_config_users(buffer, "john");
+	config.hostname = get_config_hostname();
 }
 
 void config_parse_file(char* filename) {
 	char* buffer = read_config_file(filename);
 
-	config.domain = get_config_param(buffer, "domain");
-	config.mail_path = get_config_param(buffer, "mail_path");
-	config.listen_port = get_config_param(buffer, "listen_port");
-	config.users_list = get_config_users(buffer);
-	config.hostname = get_config_hostname();
+	config_parse_buffer(buffer);
+
+	free(buffer);
 }
 
 char* config_get_domain() {

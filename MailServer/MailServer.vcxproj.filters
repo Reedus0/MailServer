@@ -101,7 +101,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="header.h">
+    <ClInclude Include="status.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="codes.h">
@@ -163,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="config.h">
       <Filter>Исходные файлы\structures\config</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
