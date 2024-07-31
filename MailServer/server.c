@@ -13,42 +13,15 @@
 #include "smtp_mail_from.h"
 #include "smtp_rcpt_to.h"
 #include "smtp_helo.h"
+#include "smtp_quit.h"
+#include "smtp_noop.h"
+#include "smtp_rset.h"
 
 static enum STATUS initialize_session(struct smtp_request** smtp_request, struct server_session* server_session) {
 	clean_smtp_request(*smtp_request);
 	*smtp_request = init_smtp_request();
 	smtp_request_set_session(*smtp_request, server_session);
 	server_session_set_state(server_session, INITIALIZED);
-	return STATUS_OK;
-}
-
-static enum STATUS serve_quit(SOCKET sock, char* buffer) {
-	if (validate_without_args(buffer, "quit") == STATUS_NOT_OK) {
-		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
-		return STATUS_NOT_OK;
-	}
-
-	send_response(sock, buffer, SERVICE_CLOSING_TRANSMISSION);
-	return STATUS_OK;
-}
-
-static enum STATUS serve_noop(SOCKET sock, char* buffer) {
-	if (validate_without_args(buffer, "noop") == STATUS_NOT_OK) {
-		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
-		return STATUS_NOT_OK;
-	}
-
-	send_response(sock, buffer, ACTION_OK);
-	return STATUS_OK;
-}
-
-static enum STATUS serve_rset(SOCKET sock, char* buffer, struct smtp_request* smtp_request) {
-	if (validate_without_args(buffer, "rset") == STATUS_NOT_OK) {
-		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
-		return STATUS_NOT_OK;
-	}
-
-	send_response(sock, buffer, ACTION_OK);
 	return STATUS_OK;
 }
 

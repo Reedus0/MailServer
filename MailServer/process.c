@@ -15,7 +15,7 @@ static enum STATUS write_mail_to_file(char* recipient, char* buffer) {
 	int mail_path_length = strlen(mail_path);
 	int recipient_length = strlen(recipient);
 	char* full_path = calloc(mail_path_length + recipient_length + 3, sizeof(char));
-	flush_to_buffer(full_path, mail_path_length + recipient_length + 2, "%s/%s", mail_path, recipient);
+	flush_to_buffer(full_path, 2, "%s/%s", mail_path, recipient);
 
 	FILE* file_ptr = fopen(full_path, "ab");
 	if (file_ptr == NULL) {

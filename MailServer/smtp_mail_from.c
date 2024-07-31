@@ -18,7 +18,7 @@ enum STATUS serve_mail_from(SOCKET sock, char* buffer, struct smtp_request* smtp
 	char* mail_from = get_value_from_buffer(buffer, ":");
 	mail_from = trim_string(mail_from);
 
-	if (!validate_email_string(mail_from)) {
+	if (validate_email_string(mail_from) == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;
 	}

@@ -32,11 +32,11 @@ static enum STATUS check_user(char* user) {
 
 static enum STATUS validate_user(struct email_address* user) {
 
-	if (!check_domain(user->domain)) {
+	if (check_domain(user->domain) == STATUS_NOT_OK) {
 		return STATUS_NOT_OK;
 	}
 
-	if (!check_user(user->user)) {
+	if (check_user(user->user) == STATUS_NOT_OK) {
 		return STATUS_NOT_OK;
 	}
 
@@ -52,7 +52,7 @@ enum STATUS serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_r
 	char* rcpt_to = get_value_from_buffer(buffer, ":");
 	rcpt_to = trim_string(rcpt_to);
 
-	if (!validate_email_string(rcpt_to)) {
+	if (validate_email_string(rcpt_to) == STATUS_NOT_OK) {
 		send_response(sock, buffer, SYNTAX_ERROR_PARAMETERS);
 		return STATUS_NOT_OK;
 	}
@@ -60,7 +60,7 @@ enum STATUS serve_rcpt_to(SOCKET sock, char* buffer, struct smtp_request* smtp_r
 	struct email_address* rcpt_to_email_address = string_to_email_address(rcpt_to);
 	free(rcpt_to);
 
-	if (!validate_user(rcpt_to_email_address)) {
+	if (validate_user(rcpt_to_email_address) == STATUS_NOT_OK) {
 		send_response(sock, buffer, USER_NOT_LOCAL);
 		clean_email_address(rcpt_to_email_address);
 		return STATUS_NOT_OK;

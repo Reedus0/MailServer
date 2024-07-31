@@ -6,7 +6,7 @@ struct email_address {
 };
 
 struct email_address* init_email_address();
-int validate_email_string(char* string);
+enum STATUS validate_email_string(char* string);
 struct email_address* string_to_email_address(char* string);
 char* email_address_to_string(struct email_address* email_address);
 enum STATUS email_address_set_user(struct email_address* email_address, char* user);

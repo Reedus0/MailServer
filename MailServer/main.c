@@ -15,7 +15,12 @@ int main(int argv, char* argc[]) {
         return 1;
     }
 
-    config_parse_file("E:/config.txt");
+    if (argv < 2) {
+        printf("Usage: %s config_file_path", argc[0]);
+        return 1;
+    }
+
+    config_parse_file(argc[1]);
 
     int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 

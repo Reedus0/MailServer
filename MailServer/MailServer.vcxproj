@@ -119,6 +119,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,8 +143,11 @@
     <ClCompile Include="smtp_data.c" />
     <ClCompile Include="smtp_helo.c" />
     <ClCompile Include="smtp_mail_from.c" />
+    <ClCompile Include="smtp_noop.c" />
+    <ClCompile Include="smtp_quit.c" />
     <ClCompile Include="smtp_rcpt_to.c" />
     <ClCompile Include="smtp_request.c" />
+    <ClCompile Include="smtp_rset.c" />
     <ClCompile Include="validation.c" />
   </ItemGroup>
   <ItemGroup>
@@ -162,8 +166,11 @@
     <ClInclude Include="smtp_data.h" />
     <ClInclude Include="smtp_helo.h" />
     <ClInclude Include="smtp_mail_from.h" />
+    <ClInclude Include="smtp_noop.h" />
+    <ClInclude Include="smtp_quit.h" />
     <ClInclude Include="smtp_rcpt_to.h" />
     <ClInclude Include="smtp_request.h" />
+    <ClInclude Include="smtp_rset.h" />
     <ClInclude Include="validation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

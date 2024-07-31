@@ -10,9 +10,10 @@ int test_list_insert() {
     list_insert(&first_list, &second_list);
 
     if (ptr_except_eq(first_list.next, &second_list)) {
-        printf("test_list_insert OK\n");
+        printf("%s OK\n", __func__);
         return 1;
     }
+    printf("%s NOT OK\n", __func__);
     return 0;
 }
 
@@ -24,9 +25,10 @@ int test_list_remove_last() {
     list_remove(&second_list);
 
     if (ptr_except_eq(first_list.next, NULL)) {
-        printf("test_list_remove_center OK\n");
+        printf("%s OK\n", __func__);
         return 1;
     }
+    printf("%s NOT OK\n", __func__);
     return 0;
 }
 
@@ -40,8 +42,9 @@ int test_list_remove_center() {
     list_remove(&second_list);
 
     if (ptr_except_eq(first_list.next, &third_list) && ptr_except_eq(third_list.prev, &first_list)) {
-        printf("test_list_remove_center OK\n");
+        printf("%s OK\n", __func__);
         return 1;
     }
+    printf("%s NOT OK\n", __func__);
     return 0;
 }

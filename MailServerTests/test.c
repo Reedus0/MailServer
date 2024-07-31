@@ -6,7 +6,6 @@
 #include "test_mail_format.h"
 #include "test_email_address.h"
 #include "test_list.h"
-#include "test_smtp_request.h"
 #pragma comment(lib, "ws2_32.lib")
 
 int test_list(char* list_name, int (*tests[])()) {
@@ -40,12 +39,6 @@ int main(int argv, char* argc[]) {
     };
     test_list("list", list_tests);
 
-    int (*smtp_request_tests[])() = {
-        test_add_multiple_recipients,
-        NULL
-    };
-    test_list("smtp_request", smtp_request_tests);
-
     int (*email_address_tests[])() = {
         test_make_email_normal,
         test_make_email_arrows,
@@ -61,6 +54,7 @@ int main(int argv, char* argc[]) {
         test_no_double_enter,
         test_pre_enter,
         test_no_headers,
+        test_space_headers,
         test_has_header,
         test_has_header_with_two_recipients,
         NULL

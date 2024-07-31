@@ -88,17 +88,14 @@ char* build_mail(struct mail* mail) {
 	struct mail_header* current_header = mail->headers_list;
 
 	while (1) {
-		int name_length = strlen(current_header->name);
-		int value_length = strlen(current_header->value);
-		flush_to_buffer(result, name_length + value_length + 5, "%s: %s\r\n", current_header->name, current_header->value);
+		flush_to_buffer(result, 2, "%s: %s\r\n", current_header->name, current_header->value);
 		if (current_header->list.prev == NULL) {
 			break;
 		}
 		current_header = list_parent(current_header->list.prev, struct mail_header, list);
 	}
 
-	int text_length = strlen(mail->text);
-	flush_to_buffer(result, text_length + 5, "\r\n%s\r\n", mail->text);
+	flush_to_buffer(result, 1, "\r\n%s\r\n", mail->text);
 
 	return result;
 }

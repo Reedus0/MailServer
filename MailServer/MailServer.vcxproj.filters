@@ -34,6 +34,9 @@
     <Filter Include="Исходные файлы\structures\server_session">
       <UniqueIdentifier>{77d13915-730a-4663-ada5-86ed919689ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\structures\config">
+      <UniqueIdentifier>{4cfd414c-9745-4e4e-b84c-f81f43f2b41b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -46,9 +49,6 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="process.c">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="config.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="list.c">
@@ -87,6 +87,18 @@
     <ClCompile Include="validation.c">
       <Filter>Исходные файлы\smtp</Filter>
     </ClCompile>
+    <ClCompile Include="smtp_noop.c">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="smtp_quit.c">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="smtp_rset.c">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="config.c">
+      <Filter>Исходные файлы\structures\config</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header.h">
@@ -102,9 +114,6 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="process.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="config.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="list.h">
@@ -142,6 +151,18 @@
     </ClInclude>
     <ClInclude Include="validation.h">
       <Filter>Исходные файлы\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="smtp_noop.h">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="smtp_rset.h">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="smtp_quit.h">
+      <Filter>Исходные файлы\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>Исходные файлы\structures\config</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

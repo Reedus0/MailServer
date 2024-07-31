@@ -76,7 +76,7 @@ enum STATUS mail_add_timestamp(struct mail* mail, struct email_address* mail_fro
 	char* time_string = get_time_string();
 	char* timestamp = calloc(TIMESTAMP_SIZE, sizeof(char));
 
-	flush_to_buffer(timestamp, TIMESTAMP_SIZE, "From %s %s\r\n", mail_from_string, time_string);
+	flush_to_buffer(timestamp, 2, "From %s %s\r\n", mail_from_string, time_string);
 
 	free(mail_from_string);
 
@@ -98,8 +98,7 @@ static char* get_all_recipients(struct smtp_request* smtp_request) {
 			free(recipient_user);
 			break;
 		}
-		int recipient_user_length = strlen(recipient_user);
-		flush_to_buffer(result, recipient_user_length + 3, "%s, ", recipient_user);
+		flush_to_buffer(result, 1, "%s, ", recipient_user);
 		current_recipient = list_parent(current_recipient->list.prev, struct smtp_request_recipient, list);
 		free(recipient_user);
 	}
@@ -114,12 +113,7 @@ static char* get_received(char* hostname) {
 	char* server_hostname = config_get_hostname();
 	char* server_domain = config_get_domain();
 
-	int hostname_length = strlen(hostname);
-	int time_string_length = strlen(time_string);
-	int server_domain_length = strlen(server_domain);
-	int server_hostname_length = strlen(server_hostname);
-
-	flush_to_buffer(result, hostname_length + time_string_length + server_hostname_length + server_domain_length + 14, "from %s by %s.%s; %s", hostname, server_hostname, server_domain, time_string);
+	flush_to_buffer(result, 4, "from %s by %s.%s; %s", hostname, server_hostname, server_domain, time_string);
 
 	return result;
 }

@@ -8,6 +8,7 @@ struct server_session* init_server_session() {
 
 	new_server_session->hostname = NULL;
 	new_server_session->state = DEFAULT;
+	return new_server_session;
 }
 
 enum STATUS server_session_set_hostname(struct server_session* server_session, char* hostname) {
@@ -31,4 +32,6 @@ enum STATUS clean_server_session(struct server_session* server_session) {
 	free(server_session->hostname);
 	
 	free(server_session);
+
+	return STATUS_OK;
 }

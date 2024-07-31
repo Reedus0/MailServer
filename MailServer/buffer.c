@@ -9,10 +9,17 @@ void add_to_buffer(char* buffer, char* message) {
 	memcpy(buffer + strlen(buffer), message, strlen(message) + 1);
 }
 
-void flush_to_buffer(char* buffer, int size, char* format, ...) {
+void flush_to_buffer(char* buffer, int count, char* format, ...) {
 	va_list va;
+	va_list args;
+	va_start(args, format);
+	int total_size = strlen(format) - (2 * count) + 1;
+	for (int i = 0; i < count; i++) {
+		total_size += strlen(va_arg(args, char*));
+	}
 	va_start(va, format);
-	vsnprintf(buffer + strlen(buffer), size, format, va);
+	vsnprintf(buffer + strlen(buffer), total_size, format, va);
+	va_end(args);
 	va_end(va);
 }
 

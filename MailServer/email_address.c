@@ -13,17 +13,22 @@ struct email_address* init_email_address() {
 	return new_email_address;
 }
 
-int validate_email_string(char* string) {
+enum STATUS validate_email_string(char* string) {
 	int has_username = strchr(string, '@') != string;
-	int INITIALIZED = strchr(string, '@') - string != strlen(string) - 1;
+	int has_domain = strchr(string, '@') - string != strlen(string) - 1;
 	int has_email_symbol = strchr(string, '@') != NULL;
 	int one_email_symbol = strchr(string, '@') == strrchr(string, '@');
 
-	return has_username && INITIALIZED && has_email_symbol && one_email_symbol;
+	if (has_username && has_domain && has_email_symbol && one_email_symbol) {
+		return STATUS_OK;
+	}
+	return STATUS_NOT_OK;
 }
 
 static char* remove_email_arrows(char* string) {
-	if (*string == '<') {
+	char first_symbol = *string;
+	char last_symbol = *(string + strlen(string) - 1);
+	if (first_symbol == '<' && last_symbol == '>') {
 		*(string + strlen(string) - 1) = 0;
 		return string += 1;
 	}
@@ -55,7 +60,7 @@ char* email_address_to_string(struct email_address* email_address) {
 
 	char* result = calloc(user_length + domain_length + 3, sizeof(char));
 
-	flush_to_buffer(result, user_length + domain_length + 2, "%s@%s", email_address->user, email_address->domain);
+	flush_to_buffer(result, 2, "%s@%s", email_address->user, email_address->domain);
 
 	return result;
 }
