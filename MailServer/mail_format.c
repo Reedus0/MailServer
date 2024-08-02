@@ -110,7 +110,8 @@ static char* get_all_recipients(struct smtp_request* smtp_request) {
 enum STATUS mail_add_server_headers(struct mail* mail, struct smtp_request* smtp_request) {
 	char* mail_from_string = email_address_to_string(smtp_request->mail_from);
 	mail_add_header_if_not_exists(mail, "From", mail_from_string);
-	mail_replace_header(mail, "Return-Path", mail_from_string);
+	char* mail_from_string_with_arrows = email_address_string_add_arrows(mail_from_string);
+	mail_replace_header(mail, "Return-Path", mail_from_string_with_arrows);
 	free(mail_from_string);
 
 	char* all_recipients = get_all_recipients(smtp_request);

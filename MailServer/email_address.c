@@ -76,9 +76,18 @@ char* email_address_to_string(struct email_address* email_address) {
 	int user_length = strlen(email_address->user);
 	int domain_length = strlen(email_address->domain);
 
-	char* result = calloc(user_length + domain_length + 2, sizeof(char));
+	char* result = calloc(user_length + domain_length + 4, sizeof(char));
 
 	flush_to_buffer(result, 2, "%s@%s", email_address->user, email_address->domain);
 
 	return result;
+}
+
+char* email_address_string_add_arrows(char* string) {
+
+	memcpy(string + 1, string, strlen(string));
+	*(string) = '<';
+	*(string + strlen(string)) = '>';
+
+	return string;
 }

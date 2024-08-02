@@ -5,7 +5,6 @@
 
 struct list init_list() {
 	struct list new_list;
-
 	new_list.prev = NULL;
 	new_list.next = NULL;
 

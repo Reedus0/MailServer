@@ -18,7 +18,6 @@ struct smtp_request* init_smtp_request() {
 
 static struct smtp_request_recipient* init_smtp_request_recipient() {
 	struct smtp_request_recipient* new_smtp_request_recipient = calloc(1, sizeof(struct smtp_request_recipient));
-
 	new_smtp_request_recipient->list = init_list();
 	new_smtp_request_recipient->email_address = NULL;
 

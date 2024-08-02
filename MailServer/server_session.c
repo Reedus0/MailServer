@@ -5,8 +5,8 @@
 
 struct server_session* init_server_session() {
 	struct server_session* new_server_session = calloc(1, sizeof(struct server_session));
-
 	new_server_session->hostname = NULL;
+
 	return new_server_session;
 }
 

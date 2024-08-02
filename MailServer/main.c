@@ -30,7 +30,7 @@ int main(int argv, char* argc[]) {
     server_address.sin_addr.s_addr = INADDR_ANY;
     server_address.sin_port = htons(config_get_listen_port());
 
-    bind(sock, (struct sockaddr*)&server_address, sizeof(server_address));
+    bind(sock, &server_address, sizeof(server_address));
     listen(sock, MAX_PENDING_CONNECTIONS);
 
     while (1) {

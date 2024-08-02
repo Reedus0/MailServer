@@ -84,6 +84,7 @@ void serve_connection(SOCKET sock) {
 				send_response(sock, buffer, BAD_SEQUENCE);
 				continue;
 			}
+
 			status = serve_mail_from(sock, buffer, smtp_request);
 			if (status == STATUS_OK) { 
 				set_state(&current_state, HAS_MAIL_FROM);
