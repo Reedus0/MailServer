@@ -23,7 +23,7 @@ int main(int argv, char* argc[]) {
 
     config_parse_file(argc[1]);
 
-    int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;

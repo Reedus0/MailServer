@@ -41,10 +41,10 @@ void serve_connection(SOCKET sock) {
 
 	char* buffer = init_socket_buffer();
 
-	send_response(sock, buffer, SERVICE_READY);
-
 	struct smtp_request* smtp_request = init_smtp_request();
 	struct server_session* server_session = init_server_session();
+
+	send_response(sock, buffer, SERVICE_READY);
 
 	while (1) {
 
@@ -64,6 +64,11 @@ void serve_connection(SOCKET sock) {
 		}
 
 		if (buffer_has_command("rset", buffer)) {
+			if (!validate_state(current_state, INITIALIZED)) {
+				send_response(sock, buffer, BAD_SEQUENCE);
+				continue;
+			}
+
 			status = serve_rset(sock, buffer);
 			if (status == STATUS_OK) {
 				initialize_session(&smtp_request, &current_state);
@@ -124,6 +129,6 @@ void serve_connection(SOCKET sock) {
 	}
 	clean_smtp_request(smtp_request);
 	clean_server_session(server_session);
-	socket_cleanup(sock);
 	clean_socket_buffer(buffer);
+	socket_cleanup(sock);
 }

@@ -17,7 +17,13 @@ void socket_cleanup(SOCKET sock) {
 
 int get_message(SOCKET sock, char* buffer) {
 	clear_socket_buffer(buffer);
-	int status = recv(sock, buffer, BUFFER_SIZE, 0);
+	int status = 0;
+	while (1) {
+		status = recv(sock, buffer + strlen(buffer), BUFFER_SIZE, 0);
+		if (strstr(buffer, "\r\n")) {
+			break;
+		}
+	}
 	return status;
 }
 

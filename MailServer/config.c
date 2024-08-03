@@ -72,8 +72,8 @@ static char* get_config_param(char* config, char* param, char* default_param) {
 	return default_param;
 }
 
-static struct user* get_config_users(char* config, char* default_param) {
-	char* config_users = get_config_param(config, "users", default_param);
+static struct user* get_config_users(char* config, char* param, char* default_param) {
+	char* config_users = get_config_param(config, param, default_param);
 
 	char* iterator = config_users;
 
@@ -107,7 +107,7 @@ void config_parse_buffer(char* buffer) {
 	config.domain = get_config_param(buffer, "domain", "domain.local");
 	config.mail_path = get_config_param(buffer, "mail_path", "./");
 	config.listen_port = get_config_param(buffer, "listen_port", "25");
-	config.users_list = get_config_users(buffer, "");
+	config.users_list = get_config_users(buffer, "users", "");
 	config.hostname = get_config_hostname();
 }
 
